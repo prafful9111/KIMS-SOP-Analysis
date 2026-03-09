@@ -1,0 +1,142 @@
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-subtle);
+    padding: 24px;
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.iconWrapper {
+    background: rgba(10, 166, 93, 0.1);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+}
+
+.usersIcon {
+    color: var(--color-primary);
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.listHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.coachingItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.coachingItem:last-child {
+    border-bottom: none;
+}
+
+.staffMeta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 35%;
+}
+
+.avatar {
+    background: var(--color-primary);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.staffInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 35%;
+}
+
+.staffName {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.staffRole {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+}
+
+.arrowIcon {
+    color: var(--color-text-secondary);
+    opacity: 0.5;
+}
+
+.issueInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 40%;
+}
+
+.issueLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+.issueText {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.failureBadge {
+    background: rgba(255, 193, 7, 0.15);
+    /* amber/developmental background */
+    color: #b38600;
+    /* darker amber text */
+    font-weight: 700;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+}

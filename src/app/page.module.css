@@ -1,0 +1,53 @@
+.container {
+    width: 100%;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+}
+
+.bottomRow {
+    width: 100%;
+}
+
+.bottomRowGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .kpiGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chartsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .bottomRowGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpiGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 16px;
+    }
+}

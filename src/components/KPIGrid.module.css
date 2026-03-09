@@ -1,0 +1,72 @@
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid var(--color-border);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cardTitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background-color: rgba(10, 166, 93, 0.1);
+    color: var(--color-primary);
+}
+
+.iconWrapper.alert {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--score-immediate);
+}
+
+.cardValue {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-top: 4px;
+}
+
+.cardValue.alert {
+    color: var(--score-immediate);
+}
+
+.trend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.trendPositive {
+    color: var(--color-primary);
+}
+
+.trendNegative {
+    color: var(--score-immediate);
+}

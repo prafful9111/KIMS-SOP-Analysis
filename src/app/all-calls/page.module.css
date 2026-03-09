@@ -1,0 +1,32 @@
+.main {
+    flex: 1;
+    padding: 24px;
+    background-color: var(--color-background);
+    overflow-y: auto;
+    min-height: calc(100vh - 70px);
+}
+
+.pageHeader {
+    margin-bottom: 24px;
+}
+
+.pageTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 8px 0;
+}
+
+.pageSubtitle {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.tableContainer {
+    margin-top: 24px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-subtle);
+    overflow: hidden;
+}

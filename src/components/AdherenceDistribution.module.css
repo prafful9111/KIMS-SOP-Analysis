@@ -1,0 +1,31 @@
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-subtle);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 340px;
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.chartContainer {
+    flex: 1;
+    min-height: 250px;
+}

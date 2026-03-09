@@ -1,0 +1,22 @@
+.chartCard {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chartTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 24px;
+}
+
+.chartContainer {
+    height: 300px;
+    width: 100%;
+}

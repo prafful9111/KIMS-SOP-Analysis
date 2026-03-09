@@ -1,0 +1,121 @@
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-subtle);
+    padding: 24px;
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.table th {
+    background: var(--color-background);
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-border);
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.tableRow {
+    transition: background 0.2s;
+}
+
+.tableRow:hover {
+    background: rgba(10, 166, 93, 0.02);
+}
+
+.stepInfo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.stepNumber {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-top: -2px;
+}
+
+.stepText {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+}
+
+.centerCol {
+    text-align: center;
+    min-width: 100px;
+}
+
+.badgeCompleted {
+    background: rgba(10, 166, 93, 0.1);
+    color: var(--score-proficient);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badgeIncorrect {
+    background: rgba(255, 193, 7, 0.15);
+    color: #b38600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badgeMissed {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--score-immediate);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}

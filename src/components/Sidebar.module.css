@@ -1,0 +1,124 @@
+.sidebar {
+    width: 260px;
+    background-color: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.topSection {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--color-border);
+    height: 81px;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.logoText {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-primary);
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.logoText span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.logoIcon {
+    color: var(--score-immediate);
+    flex-shrink: 0;
+}
+
+.toggleBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.toggleBtn:hover {
+    color: var(--color-primary);
+}
+
+.sidebar.collapsed .topSection {
+    padding: 20px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .logoText {
+    display: none;
+}
+
+.navMenu {
+    flex: 1;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.navItem:hover {
+    background-color: var(--color-background);
+    color: var(--color-primary);
+}
+
+.navItem.active {
+    background: var(--color-gradient-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(40, 125, 171, 0.3);
+}
+
+.navIcon {
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed .navItem {
+    padding: 12px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .navText {
+    display: none;
+}

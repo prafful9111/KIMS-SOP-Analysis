@@ -1,0 +1,109 @@
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-subtle);
+    padding: 24px;
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.iconWrapper {
+    background: rgba(228, 28, 70, 0.1);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+}
+
+.alertIcon {
+    color: var(--score-immediate);
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.violationItem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    border-left: 4px solid var(--score-immediate);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.violationItem:hover {
+    transform: translateX(4px);
+}
+
+.rank {
+    font-weight: 700;
+    color: white;
+    background-color: var(--score-immediate);
+    height: 28px;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.descriptionWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.scenarioTag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--score-immediate);
+    background: rgba(220, 53, 69, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    width: fit-content;
+    letter-spacing: 0.5px;
+}
+
+.description {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.count {
+    font-size: 12px;
+    font-weight: 600;
+    background: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
