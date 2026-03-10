@@ -25,6 +25,11 @@ export async function GET(req: NextRequest) {
         const now = new Date();
         if (dateRange === '1d') {
             dateFilter = new Date(now.setDate(now.getDate() - 1));
+        } else if (dateRange === 'yesterday') {
+            const start = new Date(now);
+            start.setDate(now.getDate() - 1);
+            start.setHours(0, 0, 0, 0);
+            dateFilter = start;
         } else if (dateRange === '7d') {
             dateFilter = new Date(now.setDate(now.getDate() - 7));
         } else if (dateRange === '30d') {

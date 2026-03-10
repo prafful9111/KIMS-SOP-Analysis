@@ -33,8 +33,22 @@ export default function AllCallsTable({
     const [loading, setLoading] = useState(true);
     const [selectedCall, setSelectedCall] = useState<SessionData | null>(null);
 
+    // Cache for session data
+    const cacheRef = React.useRef<Record<string, SessionData[]>>({});
+
     useEffect(() => {
+        const abortController = new AbortController();
+
         const fetchSessions = async () => {
+            const cacheKey = `${selectedScenario}-${selectedAgent}-${dateRange}`;
+
+            // Return cached data if available
+            if (cacheRef.current[cacheKey]) {
+                setCalls(cacheRef.current[cacheKey]);
+                setLoading(false);
+                return;
+            }
+
             setLoading(true);
             try {
                 const params = new URLSearchParams();
@@ -46,19 +60,30 @@ export default function AllCallsTable({
                 }
                 params.append('dateRange', dateRange);
 
-                const res = await fetch(`/api/dashboard/sessions?${params.toString()}`);
+                const res = await fetch(`/api/dashboard/sessions?${params.toString()}`, {
+                    signal: abortController.signal
+                });
+
                 if (res.ok) {
                     const data = await res.json();
-                    setCalls(data.sessions || []);
+                    const sessions = data.sessions || [];
+                    setCalls(sessions);
+                    // Cache the result
+                    cacheRef.current[cacheKey] = sessions;
                 }
-            } catch (error) {
+            } catch (error: any) {
+                if (error.name === 'AbortError') return;
                 console.error("Failed to fetch sessions", error);
             } finally {
-                setLoading(false);
+                if (!abortController.signal.aborted) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchSessions();
+
+        return () => abortController.abort();
     }, [selectedScenario, selectedAgent, dateRange]);
 
     const filteredCalls = calls.filter(call => {

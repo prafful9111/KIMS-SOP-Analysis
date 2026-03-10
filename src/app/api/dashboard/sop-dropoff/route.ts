@@ -29,6 +29,12 @@ export async function GET(req: any) {
             const now = new Date();
             let dateFilter: Date | undefined;
             if (dateRange === '1d') dateFilter = new Date(now.setDate(now.getDate() - 1));
+            else if (dateRange === 'yesterday') {
+                const start = new Date(now);
+                start.setDate(now.getDate() - 1);
+                start.setHours(0, 0, 0, 0);
+                dateFilter = start;
+            }
             else if (dateRange === '7d') dateFilter = new Date(now.setDate(now.getDate() - 7));
             else if (dateRange === '30d') dateFilter = new Date(now.setDate(now.getDate() - 30));
 

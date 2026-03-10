@@ -21,8 +21,26 @@ export default function Dashboard() {
   const [sopDropoff, setSopDropoff] = useState<any[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
 
+  // Cache to store API responses keyed by filter params
+  const cacheRef = React.useRef<Record<string, any>>({});
+
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchData = async () => {
+      const cacheKey = `${selectedScenario}-${selectedAgent}-${dateRange}`;
+
+      // Serve from cache if available
+      if (cacheRef.current[cacheKey]) {
+        const cached = cacheRef.current[cacheKey];
+        setDashboardData(cached.stats);
+        setScenarioComparison(cached.scenarios);
+        setSopDropoff(cached.dropoff);
+        setAgents(cached.agents);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         const queryParams = new URLSearchParams({
@@ -32,33 +50,53 @@ export default function Dashboard() {
         }).toString();
 
         const [statsRes, scenarioRes, dropoffRes, agentsRes] = await Promise.all([
-          fetch(`/api/dashboard/stats?${queryParams}`),
-          fetch(`/api/dashboard/scenario-comparison?${queryParams}`),
-          fetch(`/api/dashboard/sop-dropoff?${queryParams}`),
-          fetch(`/api/dashboard/agents?${queryParams}`)
+          fetch(`/api/dashboard/stats?${queryParams}`, { signal: abortController.signal }),
+          fetch(`/api/dashboard/scenario-comparison?${queryParams}`, { signal: abortController.signal }),
+          fetch(`/api/dashboard/sop-dropoff?${queryParams}`, { signal: abortController.signal }),
+          fetch(`/api/dashboard/agents?${queryParams}`, { signal: abortController.signal })
         ]);
 
-        if (statsRes.ok) setDashboardData(await statsRes.json());
-        if (scenarioRes.ok) {
-          const data = await scenarioRes.json();
-          setScenarioComparison(data.scenarios || []);
+        if (!statsRes.ok || !scenarioRes.ok || !dropoffRes.ok || !agentsRes.ok) {
+          throw new Error("One or more requests failed");
         }
-        if (dropoffRes.ok) {
-          const data = await dropoffRes.json();
-          setSopDropoff(data.steps || []);
-        }
-        if (agentsRes.ok) {
-          const data = await agentsRes.json();
-          setAgents(data.agents || []);
-        }
-      } catch (error) {
+
+        const [stats, scenariosData, dropoffData, agentsData] = await Promise.all([
+          statsRes.json(),
+          scenarioRes.json(),
+          dropoffRes.json(),
+          agentsRes.json()
+        ]);
+
+        const scenarios = scenariosData.scenarios || [];
+        const dropoff = dropoffData.steps || [];
+        const agentsSorted = agentsData.agents || [];
+
+        // Update state
+        setDashboardData(stats);
+        setScenarioComparison(scenarios);
+        setSopDropoff(dropoff);
+        setAgents(agentsSorted);
+
+        // Store in cache
+        cacheRef.current[cacheKey] = {
+          stats,
+          scenarios,
+          dropoff,
+          agents: agentsSorted
+        };
+      } catch (error: any) {
+        if (error.name === 'AbortError') return;
         console.error("Failed to fetch dashboard data", error);
       } finally {
-        setLoading(false);
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => abortController.abort();
   }, [selectedScenario, selectedAgent, dateRange]);
 
   return (
