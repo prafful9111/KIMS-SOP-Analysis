@@ -76,7 +76,7 @@ export async function GET(req: any) {
             }
         }
 
-        const steps = Object.values(stepMap).map((s) => ({
+        const steps = Object.values(stepMap).map((s: any) => ({
             ...s,
             completionRate: s.total > 0
                 ? Math.round((s.completed / (s.total - s.na)) * 100)

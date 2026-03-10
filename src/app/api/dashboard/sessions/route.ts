@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
             prisma.sessions.count({ where }),
         ]);
 
-        const rows = sessions.map((s) => {
+        const rows = sessions.map((s: any) => {
             const analysis = s.analysis_json as unknown as AnalysisJson | null;
             const adherenceTag = analysis?.result?.adherence_tag ?? null;
             const redFlagsCount = analysis?.result?.critical_violations_or_red_flags?.length ?? 0;

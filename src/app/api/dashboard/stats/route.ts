@@ -114,13 +114,13 @@ export async function GET(req: any) {
         const topViolations = Object.entries(violationFrequency)
             .sort((a, b) => b[1].count - a[1].count)
             .slice(0, 10)
-            .map(([violation, data]) => ({
+            .map(([violation, data]: [string, ViolationData]) => ({
                 violation,
                 count: data.count,
                 topAgents: Object.entries(data.agents)
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 3)
-                    .map(([name, count]) => ({ name, count }))
+                    .map(([name, count]: [string, number]) => ({ name, count }))
             }));
 
         return NextResponse.json({
