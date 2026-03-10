@@ -5,16 +5,30 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 // Initialize the Prisma pg adapter
 const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres";
-const url = new URL(connectionString.replace('?sslmode=require&pgbouncer=true', '').replace('?sslmode=require', ''));
+
+// Improved URL parsing that keeps the path correctly
+let url: URL;
+try {
+    // Remove query params for Pool config as we pass them manually
+    const baseConnString = connectionString.split('?')[0];
+    url = new URL(baseConnString);
+    console.log(`Prisma: Connecting to ${url.host}/${url.pathname.slice(1)}`);
+} catch (e) {
+    console.error("Prisma: Invalid DATABASE_URL", e);
+    throw e;
+}
 
 const pool = new Pool({
-    user: url.username,
-    password: url.password,
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
     host: url.hostname,
     port: parseInt(url.port || "5432", 10),
     database: url.pathname.slice(1),
     ssl: { rejectUnauthorized: false },
-    max: undefined // Let pg manage or restrict as needed
+});
+
+pool.on('error', (err) => {
+    console.error('Prisma: Unexpected error on idle client', err);
 });
 const adapter = new PrismaPg(pool);
 
