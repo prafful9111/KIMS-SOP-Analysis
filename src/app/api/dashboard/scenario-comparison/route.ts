@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { prisma, Prisma } from '@/lib/prisma';
 
 interface SOPStep {
     step: string;
