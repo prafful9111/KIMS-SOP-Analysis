@@ -18,6 +18,10 @@
     gap: 24px;
 }
 
+.fullWidthRow {
+    width: 100%;
+}
+
 .bottomRow {
     width: 100%;
 }

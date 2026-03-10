@@ -1,13 +1,16 @@
 .filterContainer {
     display: flex;
     align-items: center;
-    background-color: var(--color-surface);
+    background-color: var(--color-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 12px 24px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-subtle);
     gap: 16px;
     flex-wrap: wrap;
     border: 1px solid var(--color-border);
+    margin-bottom: 24px;
 }
 
 .divider {

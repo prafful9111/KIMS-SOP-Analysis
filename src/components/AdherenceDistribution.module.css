@@ -28,4 +28,64 @@
 .chartContainer {
     flex: 1;
     min-height: 250px;
+    position: relative;
+}
+
+.skeletonWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.skeletonCircle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin-bottom: 24px;
+}
+
+.skeletonLegend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.skeletonLegendItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.skeletonDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.skeletonLine {
+    width: 60px;
+    height: 10px;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-secondary);
+    gap: 12px;
+}
+
+.emptyIcon {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.emptyState p {
+    font-size: 14px;
 }

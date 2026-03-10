@@ -1,0 +1,62 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model sessions {
+    id             String   @id
+    created_at     DateTime @default(now())
+    updated_at     DateTime @updatedAt
+    user_id        String
+    notes          String?
+    patient_name   String?
+    scenario_id    String?
+    uhid           String?
+    analysis_json  Json?
+    usage_metadata Json?
+    transcript     String?
+
+    user        users         @relation(fields: [user_id], references: [id])
+    scenario    Scenarios?    @relation(fields: [scenario_id], references: [id])
+    audio_files audio_files[]
+}
+
+model users {
+    id         String   @id
+    name       String
+    email      String   @unique
+    password   String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    sessions    sessions[]
+    audio_files audio_files[]
+}
+
+model Scenarios {
+    id         String   @id
+    order      Int      @default(0)
+    is_active  Boolean  @default(true)
+    name       String
+    prompt     String?
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    sessions sessions[]
+}
+
+model audio_files {
+    id         String   @id
+    url        String
+    order      Int
+    created_at DateTime @default(now())
+    session_id String
+    user_id    String
+
+    session sessions @relation(fields: [session_id], references: [id])
+    user    users    @relation(fields: [user_id], references: [id])
+}

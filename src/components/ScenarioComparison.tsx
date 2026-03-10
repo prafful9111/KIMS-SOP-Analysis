@@ -13,50 +13,91 @@ import {
 } from "recharts";
 import styles from "./ScenarioComparison.module.css";
 
-const scenarioData = [
-    { name: "Cash FC", score: 76 },
-    { name: "Pre-OP", score: 82 },
-    { name: "Room", score: 88 },
-    { name: "Discharge", score: 81 },
-    { name: "PWO", score: 85 },
-];
+interface ScenarioStat {
+    id: string;
+    name: string;
+    totalSessions: number;
+    sopComplianceRate: number;
+    adherenceCounts: Record<string, number>;
+}
 
-export default function ScenarioComparison() {
+interface ScenarioComparisonProps {
+    scenarios?: ScenarioStat[];
+    loading?: boolean;
+}
+
+export default function ScenarioComparison({ scenarios = [], loading = false }: ScenarioComparisonProps) {
     const getBarColor = (score: number) => {
         if (score >= 90) return "var(--score-exceptional)";
-        if (score >= 80) return "var(--score-proficient)";
-        if (score >= 70) return "var(--score-developmental)";
+        if (score >= 70) return "var(--score-proficient)";
+        if (score >= 50) return "var(--score-developmental)";
         return "var(--score-immediate)";
     };
+
+    const chartData = scenarios.map((s) => ({
+        name: s.name.length > 12 ? s.name.substring(0, 12) + "…" : s.name,
+        fullName: s.name,
+        score: s.sopComplianceRate,
+        sessions: s.totalSessions,
+    }));
+
+    // Fallback if no data
+    const displayData = chartData.length > 0 ? chartData : [
+        { name: "No data", fullName: "No data yet", score: 0, sessions: 0 }
+    ];
 
     return (
         <div className={styles.card}>
             <div className={styles.header}>
                 <h2 className={styles.title}>Scenario Performance Comparison</h2>
-                <span className={styles.subtitle}>Average Quality Score across departments</span>
+                <span className={styles.subtitle}>
+                    {loading ? "Loading metrics..." : chartData.length > 0 ? "SOP compliance rate by scenario" : "No call data available for the selected filters"}
+                </span>
             </div>
 
-            <div className={styles.chartContainer}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                        data={scenarioData}
-                        margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
-                        <XAxis dataKey="name" tick={{ fill: "var(--color-text-secondary)", fontSize: 13 }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: "var(--color-text-secondary)", fontSize: 13 }} axisLine={false} tickLine={false} domain={[0, 100]} />
-                        <Tooltip
-                            contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "var(--shadow-medium)" }}
-                            cursor={{ fill: "rgba(0,0,0,0.02)" }}
-                            formatter={(value: any) => [`${value}%`, "Avg Score"]}
-                        />
-                        <Bar dataKey="score" radius={[4, 4, 0, 0]}>
-                            {scenarioData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={getBarColor(entry.score)} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
+            <div className={`${styles.chartContainer} ${loading ? styles.loading : ""}`}>
+                {loading ? (
+                    <div className={styles.skeletonContainer}>
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className={styles.skeletonBarWrapper}>
+                                <div className={`${styles.skeletonBar} skeleton`} style={{ height: `${Math.random() * 60 + 20}%` }}></div>
+                                <div className={`${styles.skeletonLabel} skeleton`}></div>
+                            </div>
+                        ))}
+                    </div>
+                ) : chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            data={displayData}
+                            margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
+                            <XAxis dataKey="name" tick={{ fill: "var(--color-text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fill: "var(--color-text-secondary)", fontSize: 13 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+                            <Tooltip
+                                contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "var(--shadow-medium)" }}
+                                cursor={{ fill: "rgba(0,0,0,0.02)" }}
+                                formatter={(value: any, _name: any, props: any) => [
+                                    `${value}% compliance (${props?.payload?.sessions ?? 0} sessions)`,
+                                    "SOP Score"
+                                ]}
+                                labelFormatter={(_label: any, payload: any) =>
+                                    payload?.[0]?.payload?.fullName ?? _label
+                                }
+                            />
+                            <Bar dataKey="score" radius={[4, 4, 0, 0]}>
+                                {displayData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={getBarColor(entry.score)} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className={styles.emptyState}>
+                        <div className={styles.emptyIcon}>📊</div>
+                        <p>No recording data found for this selection.</p>
+                    </div>
+                )}
             </div>
         </div>
     );

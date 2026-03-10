@@ -1,50 +1,81 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, AlertCircle, FileText } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, AlertCircle, FileText, X } from "lucide-react";
 import styles from "./AllCallsTable.module.css";
 
-interface CallRecord {
+interface SessionData {
     id: string;
-    agentName: string;
-    scenario: string;
-    date: string;
-    duration: string;
-    qualityTag: "Very Good" | "Good" | "Average" | "Weak" | "Very Weak";
-    criticalFlags: number;
+    agent_name: string;
+    scenario_name: string;
+    created_at: string;
+    adherence_tag?: string;
+    red_flags_count: number;
+    red_flags: string[];
+    summary: string;
+    duration?: string;
+    transcript?: string;
 }
-
-const mockCalls: CallRecord[] = [
-    { id: "CALL-1049", agentName: "Sarah Jenkins", scenario: "Admission", date: "2024-03-24 10:30 AM", duration: "04:15", qualityTag: "Weak", criticalFlags: 2 },
-    { id: "CALL-1048", agentName: "Rahul Sharma", scenario: "Cash FC", date: "2024-03-24 10:15 AM", duration: "06:20", qualityTag: "Very Good", criticalFlags: 0 },
-    { id: "CALL-1047", agentName: "Anita Desai", scenario: "Discharge", date: "2024-03-24 09:45 AM", duration: "03:50", qualityTag: "Average", criticalFlags: 1 },
-    { id: "CALL-1046", agentName: "Vikram Singh", scenario: "PWO", date: "2024-03-23 04:30 PM", duration: "05:10", qualityTag: "Good", criticalFlags: 0 },
-    { id: "CALL-1045", agentName: "Priya Patel", scenario: "Admission", date: "2024-03-23 02:15 PM", duration: "07:05", qualityTag: "Very Weak", criticalFlags: 3 },
-    { id: "CALL-1044", agentName: "Arjun Reddy", scenario: "Discharge", date: "2024-03-23 11:10 AM", duration: "02:45", qualityTag: "Good", criticalFlags: 0 },
-    { id: "CALL-1043", agentName: "Sarah Jenkins", scenario: "Pre-OP", date: "2024-03-23 09:20 AM", duration: "04:40", qualityTag: "Average", criticalFlags: 1 }
-];
 
 interface AllCallsTableProps {
     selectedScenario?: string;
+    selectedAgent?: string;
+    dateRange?: string;
 }
 
-export default function AllCallsTable({ selectedScenario }: AllCallsTableProps) {
+export default function AllCallsTable({
+    selectedScenario,
+    selectedAgent,
+    dateRange = "all"
+}: AllCallsTableProps) {
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedCall, setSelectedCall] = useState<CallRecord | null>(null);
+    const [calls, setCalls] = useState<SessionData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedCall, setSelectedCall] = useState<SessionData | null>(null);
 
-    const filteredCalls = mockCalls.filter(call => {
-        const matchesScenario = !selectedScenario || selectedScenario === "All Scenarios" || call.scenario === selectedScenario;
-        const matchesSearch = call.agentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    useEffect(() => {
+        const fetchSessions = async () => {
+            setLoading(true);
+            try {
+                const params = new URLSearchParams();
+                if (selectedScenario && selectedScenario !== "all" && selectedScenario !== "All Scenarios") {
+                    params.append('scenario', selectedScenario);
+                }
+                if (selectedAgent && selectedAgent !== "all") {
+                    params.append('agent', selectedAgent);
+                }
+                params.append('dateRange', dateRange);
+
+                const res = await fetch(`/api/dashboard/sessions?${params.toString()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setCalls(data.sessions || []);
+                }
+            } catch (error) {
+                console.error("Failed to fetch sessions", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSessions();
+    }, [selectedScenario, selectedAgent, dateRange]);
+
+    const filteredCalls = calls.filter(call => {
+        const searchMatch = call.agent_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             call.id.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesScenario && matchesSearch;
+        return searchMatch;
     });
 
-    const getTagClass = (tag: string) => {
+    const getTagClass = (tag?: string) => {
         switch (tag) {
-            case "Very Good": return styles.tagExceptional;
+            case "Exceptional": return styles.tagExceptional;
+            case "Proficient":
             case "Good": return styles.tagProficient;
             case "Average": return styles.tagAverage;
+            case "Developmental":
             case "Weak": return styles.tagWeak;
+            case "Immediate Action":
             case "Very Weak": return styles.tagImmediate;
             default: return "";
         }
@@ -80,23 +111,27 @@ export default function AllCallsTable({ selectedScenario }: AllCallsTableProps) 
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredCalls.length > 0 ? filteredCalls.map((call) => (
+                        {loading ? (
+                            <tr>
+                                <td colSpan={8} className={styles.emptyState}>Loading sessions...</td>
+                            </tr>
+                        ) : filteredCalls.length > 0 ? filteredCalls.map((call) => (
                             <tr key={call.id} className={styles.tableRow} onClick={() => setSelectedCall(call)}>
-                                <td className={styles.callId}>{call.id}</td>
-                                <td className={styles.dateCell}>{call.date}</td>
-                                <td><span className={styles.agentName}>{call.agentName}</span></td>
-                                <td><span className={styles.scenarioBadge}>{call.scenario}</span></td>
-                                <td className={styles.durationCell}>{call.duration}</td>
+                                <td className={styles.callId}>{call.id.substring(0, 8)}</td>
+                                <td className={styles.dateCell}>{new Date(call.created_at).toLocaleString()}</td>
+                                <td><span className={styles.agentName}>{call.agent_name}</span></td>
+                                <td><span className={styles.scenarioBadge}>{call.scenario_name}</span></td>
+                                <td className={styles.durationCell}>{call.duration || "N/A"}</td>
                                 <td>
-                                    <span className={`${styles.qualityTag} ${getTagClass(call.qualityTag)}`}>
-                                        {call.qualityTag}
+                                    <span className={`${styles.qualityTag} ${getTagClass(call.adherence_tag)}`}>
+                                        {call.adherence_tag || "Unknown"}
                                     </span>
                                 </td>
                                 <td>
-                                    {call.criticalFlags > 0 ? (
+                                    {call.red_flags_count > 0 ? (
                                         <div className={styles.flagWarning}>
                                             <AlertCircle size={14} />
-                                            <span>{call.criticalFlags}</span>
+                                            <span>{call.red_flags_count}</span>
                                         </div>
                                     ) : (
                                         <span className={styles.flagClean}>None</span>
@@ -124,34 +159,42 @@ export default function AllCallsTable({ selectedScenario }: AllCallsTableProps) 
                 <div className={styles.modalOverlay} onClick={() => setSelectedCall(null)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h3>Call Analysis Details: {selectedCall.id}</h3>
-                            <button className={styles.closeBtn} onClick={() => setSelectedCall(null)}>✕</button>
+                            <h3>Call Analysis Details: {selectedCall.id.substring(0, 8)}</h3>
+                            <button className={styles.closeBtn} onClick={() => setSelectedCall(null)}><X size={20} /></button>
                         </div>
                         <div className={styles.modalBody}>
                             <div className={styles.modalSection}>
                                 <h4>Agent Information</h4>
-                                <p><strong>Name:</strong> {selectedCall.agentName}</p>
-                                <p><strong>Scenario:</strong> {selectedCall.scenario}</p>
-                                <p><strong>Date / Time:</strong> {selectedCall.date}</p>
-                                <p className={styles.marginTop}><strong>Adherence Tag:</strong> <span className={`${styles.qualityTagModal} ${getTagClass(selectedCall.qualityTag)}`}>{selectedCall.qualityTag}</span></p>
+                                <p><strong>Name:</strong> {selectedCall.agent_name}</p>
+                                <p><strong>Scenario:</strong> {selectedCall.scenario_name}</p>
+                                <p><strong>Date / Time:</strong> {new Date(selectedCall.created_at).toLocaleString()}</p>
+                                <p className={styles.marginTop}><strong>Adherence Tag:</strong> <span className={`${styles.qualityTagModal} ${getTagClass(selectedCall.adherence_tag)}`}>{selectedCall.adherence_tag || "Unknown"}</span></p>
                             </div>
                             <div className={styles.modalSection}>
-                                <h4>AI Generated Summary</h4>
-                                <p className={styles.summaryText}>
-                                    The executive greeted the patient properly but failed to comprehensively explain the room tariff boundaries. Tone was polite but lacked necessary detailed financial disclosure resulting in a lower quality rating.
-                                </p>
-                            </div>
-                            <div className={styles.modalSection}>
-                                <h4>Critical Violations Identified ({selectedCall.criticalFlags})</h4>
-                                {selectedCall.criticalFlags > 0 ? (
+                                <h4>Critical Violations Identified ({selectedCall.red_flags_count})</h4>
+                                {selectedCall.red_flags_count > 0 ? (
                                     <ul className={styles.violationList}>
-                                        <li>Failed to confirm Room Tariff & Deposit completely.</li>
-                                        <li>Did not explicitly state non-refundable processing fees.</li>
-                                        {selectedCall.criticalFlags > 2 && <li>Missed mandatory greeting parameters.</li>}
+                                        {selectedCall.red_flags.map((flag, i) => (
+                                            <li key={i}>{flag}</li>
+                                        ))}
                                     </ul>
                                 ) : (
                                     <p className={styles.cleanText}>✓ No critical red flags detected during this interaction. Excellent execution.</p>
                                 )}
+                            </div>
+                            <div className={styles.modalSection}>
+                                <h4>Call Transcript</h4>
+                                <div className={styles.transcriptContainer}>
+                                    {selectedCall.transcript ? (
+                                        <div className={styles.transcriptText}>
+                                            {selectedCall.transcript.split('\n').map((line, i) => (
+                                                <p key={i} className={styles.transcriptLine}>{line}</p>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className={styles.emptyTranscriptText}>No transcript available for this session.</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

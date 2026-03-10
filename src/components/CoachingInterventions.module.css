@@ -40,6 +40,9 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
 }
 
 .listHeader {
@@ -139,4 +142,57 @@
     padding: 6px 12px;
     border-radius: 16px;
     border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.skeletonList {
+    display: flex;
+    flex-direction: column;
+}
+
+.skeletonItem {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border);
+    gap: 16px;
+}
+
+.skeletonAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeletonInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeletonLine {
+    height: 14px;
+    border-radius: 4px;
+}
+
+.skeletonBadge {
+    width: 80px;
+    height: 28px;
+    border-radius: 16px;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 0;
+    color: var(--color-text-secondary);
+    gap: 12px;
+}
+
+.emptyIcon {
+    font-size: 48px;
+    opacity: 0.5;
 }

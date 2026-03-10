@@ -7,7 +7,9 @@ import AllCallsTable from "@/components/AllCallsTable";
 import styles from "./page.module.css";
 
 export default function AllCallsPage() {
-    const [selectedScenario, setSelectedScenario] = useState("All Scenarios");
+    const [selectedScenario, setSelectedScenario] = useState("all");
+    const [selectedAgent, setSelectedAgent] = useState("all");
+    const [dateRange, setDateRange] = useState("all");
 
     return (
         <>
@@ -21,10 +23,18 @@ export default function AllCallsPage() {
                 <GlobalFilter
                     selectedScenario={selectedScenario}
                     setSelectedScenario={setSelectedScenario}
+                    selectedAgent={selectedAgent}
+                    setSelectedAgent={setSelectedAgent}
+                    dateRange={dateRange}
+                    setDateRange={setDateRange}
                 />
 
                 <div className={styles.tableContainer}>
-                    <AllCallsTable selectedScenario={selectedScenario} />
+                    <AllCallsTable
+                        selectedScenario={selectedScenario}
+                        selectedAgent={selectedAgent}
+                        dateRange={dateRange}
+                    />
                 </div>
             </main>
         </>

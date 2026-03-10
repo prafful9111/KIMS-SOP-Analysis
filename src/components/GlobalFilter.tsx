@@ -7,15 +7,59 @@ import { MapPin, Calendar, Building2, Filter, RotateCcw } from "lucide-react";
 interface GlobalFilterProps {
     selectedScenario?: string;
     setSelectedScenario?: (val: string) => void;
+    selectedAgent?: string;
+    setSelectedAgent?: (val: string) => void;
+    dateRange?: string;
+    setDateRange?: (val: string) => void;
 }
 
-export default function GlobalFilter({ selectedScenario, setSelectedScenario }: GlobalFilterProps) {
-    const [dateRangeType, setDateRangeType] = useState("Last 30 Days");
+export default function GlobalFilter({
+    selectedScenario,
+    setSelectedScenario,
+    selectedAgent,
+    setSelectedAgent,
+    dateRange,
+    setDateRange
+}: GlobalFilterProps) {
+    const [scenarios, setScenarios] = React.useState<any[]>([]);
+    const [agents, setAgents] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+        const fetchFilters = async () => {
+            try {
+                const [scenariosRes, agentsRes] = await Promise.all([
+                    fetch('/api/dashboard/scenarios'),
+                    fetch('/api/dashboard/agents')
+                ]);
+
+                if (scenariosRes.ok) {
+                    const data = await scenariosRes.json();
+                    setScenarios(data.scenarios || []);
+                }
+                if (agentsRes.ok) {
+                    const data = await agentsRes.json();
+                    setAgents(data.agents || []);
+                }
+            } catch (err) {
+                console.error("Failed to fetch filters", err);
+            }
+        };
+        fetchFilters();
+    }, []);
 
     const handleReset = () => {
-        if (setSelectedScenario) setSelectedScenario("All Scenarios");
-        setDateRangeType("Last 30 Days");
+        if (setSelectedScenario) setSelectedScenario("all");
+        if (setSelectedAgent) setSelectedAgent("all");
+        if (setDateRange) setDateRange("30d");
     };
+
+    const dateOptions = [
+        { label: "Today", value: "1d" },
+        { label: "Yesterday", value: "yesterday" },
+        { label: "Last 7 Days", value: "7d" },
+        { label: "Last 30 Days", value: "30d" },
+        { label: "All Time", value: "all" },
+    ];
 
     return (
         <div className={styles.filterContainer}>
@@ -23,18 +67,17 @@ export default function GlobalFilter({ selectedScenario, setSelectedScenario }: 
                 <Calendar className={styles.icon} size={18} />
                 <select
                     className={styles.select}
-                    value={dateRangeType}
-                    onChange={(e) => setDateRangeType(e.target.value)}
+                    value={dateRange}
+                    onChange={(e) => setDateRange?.(e.target.value)}
                 >
-                    <option value="Today">Today</option>
-                    <option value="Yesterday">Yesterday</option>
-                    <option value="Last 7 Days">Last 7 Days</option>
-                    <option value="Last 30 Days">Last 30 Days</option>
+                    {dateOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                     <option value="Custom Range">Custom Range...</option>
                 </select>
             </div>
 
-            {dateRangeType === "Custom Range" && (
+            {dateRange === "Custom Range" && (
                 <>
                     <div className={styles.divider}></div>
                     <div className={styles.filterGroup}>
@@ -54,29 +97,32 @@ export default function GlobalFilter({ selectedScenario, setSelectedScenario }: 
             <div className={styles.divider}></div>
 
             <div className={styles.filterGroup}>
-                <Building2 size={18} color="var(--color-text-secondary)" />
-                <select className={styles.select} defaultValue="">
-                    <option value="" disabled>Select Department / Unit</option>
-                    <option value="discharge">Discharge</option>
-                    <option value="opd">OPD</option>
-                    <option value="icu">ICU</option>
-                    <option value="emergency">Emergency</option>
-                </select>
-            </div>
-
-            <div className={styles.filterGroup}>
                 <Filter className={styles.icon} size={18} />
                 <select
                     className={styles.select}
                     value={selectedScenario}
                     onChange={(e) => setSelectedScenario?.(e.target.value)}
                 >
-                    <option value="All Scenarios">All Scenarios</option>
-                    <option value="Cash - Financial Counselling">Cash - Financial Counselling</option>
-                    <option value="Pre-OP & Day Care Admission">Pre-OP & Day Care Admission</option>
-                    <option value="Room Admission">Room Admission</option>
-                    <option value="Discharge">Discharge</option>
-                    <option value="PWO">PWO</option>
+                    <option value="all">All Scenarios</option>
+                    {scenarios.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                </select>
+            </div>
+
+            <div className={styles.divider}></div>
+
+            <div className={styles.filterGroup}>
+                <Building2 className={styles.icon} size={18} />
+                <select
+                    className={styles.select}
+                    value={selectedAgent}
+                    onChange={(e) => setSelectedAgent?.(e.target.value)}
+                >
+                    <option value="all">All Agents</option>
+                    {agents.map(a => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
                 </select>
             </div>
 

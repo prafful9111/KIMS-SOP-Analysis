@@ -70,3 +70,29 @@
 .trendNegative {
     color: var(--score-immediate);
 }
+
+.loadingCard {
+    pointer-events: none;
+}
+
+.skeletonTitle {
+    width: 120px;
+    height: 18px;
+}
+
+.skeletonIcon {
+    width: 40px;
+    height: 40px;
+}
+
+.skeletonValue {
+    width: 80px;
+    height: 38px;
+    margin-top: 4px;
+}
+
+.skeletonTrend {
+    width: 150px;
+    height: 16px;
+    margin-top: 4px;
+}

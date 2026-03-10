@@ -27,4 +27,53 @@
 .chartContainer {
     flex: 1;
     min-height: 250px;
+    position: relative;
+}
+
+.skeletonContainer {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 100%;
+    padding: 0 20px 20px 20px;
+    gap: 20px;
+}
+
+.skeletonBarWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.skeletonBar {
+    width: 100%;
+    max-width: 40px;
+}
+
+.skeletonLabel {
+    width: 60%;
+    height: 12px;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-secondary);
+    gap: 12px;
+}
+
+.emptyIcon {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.emptyState p {
+    font-size: 14px;
 }
