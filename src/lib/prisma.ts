@@ -7,38 +7,47 @@ import { PrismaPg } from '@prisma/adapter-pg';
 const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres";
 
 // Improved URL parsing that keeps the path correctly
-let url: URL;
-try {
-    // Remove query params for Pool config as we pass them manually
-    const baseConnString = connectionString.split('?')[0];
-    url = new URL(baseConnString);
-    console.log(`Prisma: Connecting to ${url.host}/${url.pathname.slice(1)}`);
-} catch (e) {
-    console.error("Prisma: Invalid DATABASE_URL", e);
-    throw e;
+const prismaClientSingleton = () => {
+    let url: URL;
+    try {
+        const baseConnString = connectionString.split('?')[0];
+        url = new URL(baseConnString);
+    } catch (e) {
+        console.error("Prisma: Invalid DATABASE_URL", e);
+        throw e;
+    }
+
+    const pool = new Pool({
+        user: decodeURIComponent(url.username),
+        password: decodeURIComponent(url.password),
+        host: url.hostname,
+        port: parseInt(url.port || "5432", 10),
+        database: url.pathname.slice(1),
+        ssl: { rejectUnauthorized: false },
+        max: 1, // Single connection to avoid Supabase pool exhaustion
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000, // Wait longer for a connection if needed
+    });
+
+    pool.on('error', (err) => {
+        console.error('Prisma: Unexpected error on idle client', err);
+    });
+
+    const adapter = new PrismaPg(pool);
+
+    console.log("Initializing Prisma with Driver Adapter...");
+    return new PrismaClient({
+        adapter,
+        log: ['error', 'warn'],
+    });
+};
+
+declare global {
+    var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
-const pool = new Pool({
-    user: decodeURIComponent(url.username),
-    password: decodeURIComponent(url.password),
-    host: url.hostname,
-    port: parseInt(url.port || "5432", 10),
-    database: url.pathname.slice(1),
-    ssl: { rejectUnauthorized: false },
-    max: 2, // Low max to avoid pool exhaustion in session mode
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-});
+export const prisma = globalThis.prisma ?? prismaClientSingleton();
 
-pool.on('error', (err) => {
-    console.error('Prisma: Unexpected error on idle client', err);
-});
-const adapter = new PrismaPg(pool);
+if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma;
 
-console.log("Initializing Prisma with Driver Adapter...");
-export const prisma = new PrismaClient({
-    adapter,
-    log: ['error', 'warn'],
-});
-
-console.log("Prisma instance created with adapter.");
+console.log("Prisma instance provided.");
