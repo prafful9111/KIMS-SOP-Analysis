@@ -26,7 +26,7 @@ export default function SOPDropoff({ selectedScenario, steps = [], loading = fal
                 <h3 className={styles.title}>Granular SOP Execution Status</h3>
                 <span className={styles.subtitle}>
                     {selectedScenario === "All Scenarios"
-                        ? "Granular execution breakdown across all analyzed sessions"
+                        ? "Granular execution breakdown across all sessions"
                         : `Step-by-step compliance for ${selectedScenario}`}
                 </span>
             </div>
@@ -63,7 +63,7 @@ export default function SOPDropoff({ selectedScenario, steps = [], loading = fal
                                 <td colSpan={5}>
                                     <div className={styles.emptyState}>
                                         <div className={styles.emptyIcon}>📝</div>
-                                        <p>No analyzed sessions found for the current selection.</p>
+                                        <p>No sessions found for the current selection.</p>
                                     </div>
                                 </td>
                             </tr>

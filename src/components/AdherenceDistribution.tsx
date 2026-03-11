@@ -36,7 +36,7 @@ export default function AdherenceDistribution({ adherenceCounts = {}, loading = 
             <div className={styles.header}>
                 <h3 className={styles.title}>Adherence Tag Distribution</h3>
                 <span className={styles.subtitle}>
-                    {loading ? "Calculating distribution..." : data.length > 0 ? `${Object.values(adherenceCounts).reduce((a, b) => a + b, 0)} sessions with AI analysis` : "No analyzed sessions found"}
+                    {loading ? "Calculating distribution..." : data.length > 0 ? `${Object.values(adherenceCounts).reduce((a, b) => a + b, 0)} total sessions` : "No sessions found"}
                 </span>
             </div>
             <div className={styles.chartContainer}>

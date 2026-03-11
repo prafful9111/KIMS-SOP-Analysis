@@ -80,7 +80,7 @@ export default function CoachingInterventions({ agents = [], loading = false }: 
                                     <div className={styles.staffInfo}>
                                         <span className={styles.staffName}>{agent.name}</span>
                                         <span className={styles.staffRole}>
-                                            {agent.analyzedSessions} analyzed • {agent.totalSessions} total
+                                            {agent.analyzedSessions} sessions • {agent.totalSessions} total
                                         </span>
                                     </div>
                                 </div>

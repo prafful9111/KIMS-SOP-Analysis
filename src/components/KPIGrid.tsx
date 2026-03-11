@@ -52,7 +52,7 @@ export default function KPIGrid({
                 <div className={styles.cardValue}>{totalSessions.toLocaleString()}</div>
                 <div className={styles.trend}>
                     <span style={{ color: "var(--color-text-secondary)" }}>
-                        {analyzedSessions} analyzed with AI
+                        {analyzedSessions} total sessions
                     </span>
                 </div>
             </div>

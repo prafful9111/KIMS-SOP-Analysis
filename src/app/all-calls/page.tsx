@@ -17,7 +17,7 @@ export default function AllCallsPage() {
             <main className={styles.main}>
                 <div className={styles.pageHeader}>
                     <h1 className={styles.pageTitle}>All Calls</h1>
-                    <p className={styles.pageSubtitle}>Detailed log of analyzed call recordings across all scenarios.</p>
+                    <p className={styles.pageSubtitle}>Detailed log of call recordings across all scenarios.</p>
                 </div>
 
                 <GlobalFilter

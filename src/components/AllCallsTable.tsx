@@ -184,7 +184,7 @@ export default function AllCallsTable({
                 <div className={styles.modalOverlay} onClick={() => setSelectedCall(null)}>
                     <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h3>Call Analysis Details: {selectedCall.id.substring(0, 8)}</h3>
+                            <h3>Call Details: {selectedCall.id.substring(0, 8)}</h3>
                             <button className={styles.closeBtn} onClick={() => setSelectedCall(null)}><X size={20} /></button>
                         </div>
                         <div className={styles.modalBody}>

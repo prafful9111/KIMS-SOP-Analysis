@@ -88,7 +88,7 @@ export async function GET(req: any) {
 
         const steps = Object.values(stepMap).map((s: any) => ({
             ...s,
-            completionRate: s.total > 0
+            completionRate: (s.total - s.na) > 0
                 ? Math.round((s.completed / (s.total - s.na)) * 100)
                 : 0,
         })).sort((a, b) => a.completionRate - b.completionRate); // worst first
