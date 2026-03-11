@@ -1,0 +1,292 @@
+.container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.titleSection h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.titleSection p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+}
+
+
+.tableSection {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.tableHeader {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tableHeader h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.tableActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.localFilter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-background-alt);
+    border: 1px solid var(--color-border);
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.localFilter:hover {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+}
+
+.filterIcon {
+    color: var(--color-text-secondary);
+}
+
+.localSelect {
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    outline: none;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.table th {
+    background: var(--color-background-alt);
+    padding: 14px 24px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-border);
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.tableRow:hover {
+    background-color: var(--color-background-alt);
+    cursor: pointer;
+}
+
+.agentNameCell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.agentName {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.agentEmail {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.statsBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.priorityHigh {
+    background-color: rgba(217, 48, 37, 0.1);
+    color: #D93025;
+}
+
+.priorityMedium {
+    background-color: rgba(249, 171, 0, 0.1);
+    color: #B07900;
+}
+
+.priorityLow {
+    background-color: rgba(27, 129, 62, 0.1);
+    color: #1B813E;
+}
+
+.rewardCard {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.rewardCard::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--color-primary);
+}
+
+.rewardCard.priority::before {
+    background: var(--score-immediate);
+}
+
+.rewardLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+.rewardValue {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.rewardSubtext {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.chartCard {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.chartHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.chartHeader h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+
+
+.complianceHigh {
+    background-color: rgba(10, 166, 93, 0.1);
+    color: var(--color-primary);
+}
+
+.complianceMid {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #b38600;
+}
+
+.complianceLow {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--score-immediate);
+}
+
+.violationCount {
+    font-weight: 600;
+}
+
+.violationWarning {
+    color: var(--score-immediate);
+}
+
+.adherenceMini {
+    display: flex;
+    gap: 4px;
+}
+
+.adherenceDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.loadingWrapper {
+    padding: 48px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.emptyState {
+    padding: 64px 24px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.emptyState h3 {
+    margin-top: 16px;
+    font-size: 18px;
+    color: var(--color-text-primary);
+}

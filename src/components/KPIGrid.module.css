@@ -1,18 +1,26 @@
 .card {
     background-color: var(--color-surface);
-    border-radius: var(--radius-lg);
-    padding: 24px;
+    border-radius: var(--radius-md);
+    padding: 20px;
     box-shadow: var(--shadow-subtle);
     display: flex;
     flex-direction: column;
     gap: 12px;
     border: 1px solid var(--color-border);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .card:hover {
+    border-color: #cbd5e1;
     box-shadow: var(--shadow-medium);
-    transform: translateY(-2px);
+}
+
+.clickableCard {
+    cursor: pointer;
+}
+
+.clickableCard:active {
+    transform: scale(0.98);
 }
 
 .cardHeader {
@@ -22,32 +30,58 @@
 }
 
 .cardTitle {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.titleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+}
+
+.infoIconWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: help;
+    color: var(--color-text-tertiary);
+    transition: all 0.2s ease;
+    opacity: 0.4;
+}
+
+.infoIconWrapper:hover {
+    color: var(--color-primary);
+    opacity: 1;
 }
 
 .iconWrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-md);
-    background-color: rgba(10, 166, 93, 0.1);
+    background-color: rgba(10, 166, 93, 0.08);
     color: var(--color-primary);
 }
 
 .iconWrapper.alert {
-    background-color: rgba(220, 53, 69, 0.1);
+    background-color: rgba(220, 53, 69, 0.08);
     color: var(--score-immediate);
 }
 
 .cardValue {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--color-text-primary);
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .cardValue.alert {
@@ -58,9 +92,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .trendPositive {
@@ -71,28 +104,74 @@
     color: var(--score-immediate);
 }
 
+.trendLabel {
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+}
+
 .loadingCard {
     pointer-events: none;
 }
 
 .skeletonTitle {
-    width: 120px;
-    height: 18px;
+    width: 100px;
+    height: 16px;
 }
 
 .skeletonIcon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
 }
 
 .skeletonValue {
-    width: 80px;
-    height: 38px;
+    width: 60px;
+    height: 32px;
     margin-top: 4px;
 }
 
 .skeletonTrend {
-    width: 150px;
-    height: 16px;
+    width: 120px;
+    height: 14px;
     margin-top: 4px;
+}
+
+.tooltipText {
+    visibility: hidden;
+    background-color: #1A1C1E;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 100;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 11px;
+    font-weight: 500;
+    box-shadow: var(--shadow-premium);
+    width: 200px;
+    line-height: 1.4;
+    pointer-events: none;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.tooltipText::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #1A1C1E transparent transparent transparent;
+}
+
+.infoIconWrapper:hover .tooltipText {
+    visibility: visible;
+    opacity: 1;
+    bottom: calc(100% + 14px);
 }

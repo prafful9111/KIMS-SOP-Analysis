@@ -4,11 +4,15 @@ import React from "react";
 import { Bell, User } from "lucide-react";
 import styles from "./Header.module.css";
 
-export default function Header() {
+interface HeaderProps {
+    title?: string;
+}
+
+export default function Header({ title = "SOP Compliance & Quality Overview" }: HeaderProps) {
     return (
         <header className={styles.header}>
             <div className={styles.leftSection}>
-                <h1 className={styles.title}>SOP Compliance & Quality Overview</h1>
+                <h1 className={styles.title}>{title}</h1>
             </div>
             <div className={styles.rightSection}>
                 <button className={styles.iconButton} aria-label="Notifications">

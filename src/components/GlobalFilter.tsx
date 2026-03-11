@@ -7,22 +7,32 @@ import { MapPin, Calendar, Building2, Filter, RotateCcw } from "lucide-react";
 interface GlobalFilterProps {
     selectedScenario?: string;
     setSelectedScenario?: (val: string) => void;
-    selectedAgent?: string;
-    setSelectedAgent?: (val: string) => void;
+    selectedStaff?: string;
+    setSelectedStaff?: (val: string) => void;
     dateRange?: string;
     setDateRange?: (val: string) => void;
+    hideStaffFilter?: boolean;
 }
+
+export const capitalizeName = (name: string) => {
+    if (!name) return "";
+    return name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+};
 
 export default function GlobalFilter({
     selectedScenario,
     setSelectedScenario,
-    selectedAgent,
-    setSelectedAgent,
+    selectedStaff,
+    setSelectedStaff,
     dateRange,
-    setDateRange
+    setDateRange,
+    hideStaffFilter = false
 }: GlobalFilterProps) {
     const [scenarios, setScenarios] = React.useState<any[]>([]);
-    const [agents, setAgents] = React.useState<any[]>([]);
+    const [staffList, setStaffList] = React.useState<any[]>([]);
 
     React.useEffect(() => {
         const fetchFilters = async () => {
@@ -38,7 +48,7 @@ export default function GlobalFilter({
                 }
                 if (agentsRes.ok) {
                     const data = await agentsRes.json();
-                    setAgents(data.agents || []);
+                    setStaffList(data.agents || []);
                 }
             } catch (err) {
                 console.error("Failed to fetch filters", err);
@@ -49,7 +59,7 @@ export default function GlobalFilter({
 
     const handleReset = () => {
         if (setSelectedScenario) setSelectedScenario("all");
-        if (setSelectedAgent) setSelectedAgent("all");
+        if (setSelectedStaff) setSelectedStaff("all");
         if (setDateRange) setDateRange("30d");
     };
 
@@ -77,23 +87,6 @@ export default function GlobalFilter({
                 </select>
             </div>
 
-            {dateRange === "Custom Range" && (
-                <>
-                    <div className={styles.divider}></div>
-                    <div className={styles.filterGroup}>
-                        <span className={styles.label}>Start Date:</span>
-                        <input type="date" className={styles.dateInput} />
-                    </div>
-
-                    <div className={styles.divider}></div>
-
-                    <div className={styles.filterGroup}>
-                        <span className={styles.label}>End Date:</span>
-                        <input type="date" className={styles.dateInput} />
-                    </div>
-                </>
-            )}
-
             <div className={styles.divider}></div>
 
             <div className={styles.filterGroup}>
@@ -103,34 +96,35 @@ export default function GlobalFilter({
                     value={selectedScenario}
                     onChange={(e) => setSelectedScenario?.(e.target.value)}
                 >
-                    <option value="all">All Scenarios</option>
+                    <option value="all">All Departments</option>
                     {scenarios.map(s => (
                         <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                 </select>
             </div>
 
-            <div className={styles.divider}></div>
-
-            <div className={styles.filterGroup}>
-                <Building2 className={styles.icon} size={18} />
-                <select
-                    className={styles.select}
-                    value={selectedAgent}
-                    onChange={(e) => setSelectedAgent?.(e.target.value)}
-                >
-                    <option value="all">All Agents</option>
-                    {agents.map(a => (
-                        <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
-                </select>
-            </div>
-
-            <div className={styles.divider}></div>
+            {!hideStaffFilter && (
+                <>
+                    <div className={styles.divider}></div>
+                    <div className={styles.filterGroup}>
+                        <Building2 className={styles.icon} size={18} />
+                        <select
+                            className={styles.select}
+                            value={selectedStaff}
+                            onChange={(e) => setSelectedStaff?.(e.target.value)}
+                        >
+                            <option value="all">All Staff</option>
+                            {staffList.map(a => (
+                                <option key={a.id} value={a.id}>{capitalizeName(a.name)}</option>
+                            ))}
+                        </select>
+                    </div>
+                </>
+            )}
 
             <button className={styles.resetBtn} onClick={handleReset}>
                 <RotateCcw size={16} />
-                Reset Filters
+                Reset
             </button>
         </div>
     );

@@ -52,6 +52,7 @@
     padding: 20px;
     box-shadow: var(--shadow-subtle);
     transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .violationCard:hover {

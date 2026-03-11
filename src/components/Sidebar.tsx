@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./Sidebar.module.css";
-import { LayoutDashboard, ChevronLeft, ChevronRight, Activity, PhoneCall } from "lucide-react";
+import { LayoutDashboard, ChevronLeft, ChevronRight, Activity, PhoneCall, Users } from "lucide-react";
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
@@ -14,10 +14,10 @@ export default function Sidebar() {
         <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
             <div className={styles.topSection}>
                 <div className={styles.logoContainer}>
-                    <img 
-                        src={collapsed ? "/KIMSpng.jpeg" : "/KIMSpng.png"} 
-                        alt="KIMS logo" 
-                        className={collapsed ? styles.logoImageCollapsed : styles.logoImage} 
+                    <img
+                        src={collapsed ? "/KIMSpng.jpeg" : "/KIMSpng.png"}
+                        alt="KIMS logo"
+                        className={collapsed ? styles.logoImageCollapsed : styles.logoImage}
                     />
                 </div>
                 <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
@@ -33,6 +33,10 @@ export default function Sidebar() {
                 <Link href="/all-calls" className={`${styles.navItem} ${pathname === "/all-calls" ? styles.active : ""}`}>
                     <PhoneCall className={styles.navIcon} size={20} />
                     <span className={styles.navText}>All Calls</span>
+                </Link>
+                <Link href="/agent-analysis" className={`${styles.navItem} ${pathname === "/agent-analysis" ? styles.active : ""}`}>
+                    <Users className={styles.navIcon} size={20} />
+                    <span className={styles.navText}>Staff Analysis</span>
                 </Link>
             </nav>
         </aside>

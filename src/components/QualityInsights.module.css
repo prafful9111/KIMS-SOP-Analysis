@@ -1,0 +1,138 @@
+.card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-subtle);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 280px;
+}
+
+.header {
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 2px 0;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.listContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+}
+
+.tagRow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.tagRow:hover {
+    background-color: var(--color-background-alt);
+    border-color: var(--color-border);
+}
+
+.tagRow:active {
+    background-color: #f1f3f5;
+}
+
+.tagInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tagName {
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tagLabel {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.tagStats {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+}
+
+.barContainer {
+    width: 100%;
+    height: 6px;
+    background-color: var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.barFill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.skeletonWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+.skeletonRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeletonText {
+    height: 14px;
+    width: 100%;
+}
+
+.skeletonBar {
+    height: 6px;
+    width: 100%;
+    border-radius: 3px;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-secondary);
+    gap: 12px;
+}
+
+.emptyIcon {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.emptyState p {
+    font-size: 14px;
+}

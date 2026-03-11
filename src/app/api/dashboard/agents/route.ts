@@ -86,8 +86,12 @@ export async function GET(req: any) {
             avgComplianceRate: number;
         }> = {};
 
-        // Initialize all users
-        for (const user of users) {
+        // Initialize only requested user if filtered
+        const filteredUsers = (agentId && agentId !== 'all') 
+            ? users.filter(u => u.id === agentId)
+            : users;
+
+        for (const user of filteredUsers) {
             agentMap[user.id] = {
                 id: user.id,
                 name: user.name.trim(),

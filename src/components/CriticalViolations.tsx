@@ -3,6 +3,7 @@
 import React from "react";
 import styles from "./CriticalViolations.module.css";
 import { AlertCircle } from "lucide-react";
+import { capitalizeName } from "./GlobalFilter";
 
 interface AgentMetric {
     name: string;
@@ -19,12 +20,14 @@ interface CriticalViolationsProps {
     topViolations?: ViolationEntry[];
     loading?: boolean;
     selectedScenarioName?: string;
+    onViolationClick?: (violation: string) => void;
 }
 
 export default function CriticalViolations({
     topViolations = [],
     loading = false,
-    selectedScenarioName = "All Scenarios"
+    selectedScenarioName = "All Departments",
+    onViolationClick
 }: CriticalViolationsProps) {
     return (
         <div className={styles.card}>
@@ -32,7 +35,7 @@ export default function CriticalViolations({
                 <div>
                     <h3 className={styles.title}>Critical Violations & Red Flags</h3>
                     <span className={styles.subtitle}>
-                        {selectedScenarioName === "All Scenarios"
+                        {selectedScenarioName === "All Departments"
                             ? "Compliance omissions across all monitored sessions"
                             : `Omissions specifically for ${selectedScenarioName}`}
                     </span>
@@ -60,7 +63,11 @@ export default function CriticalViolations({
                 ) : (
                     <div className={styles.gridContainer}>
                         {topViolations.map((v, index) => (
-                            <div key={index} className={styles.violationCard}>
+                            <div 
+                                key={index} 
+                                className={styles.violationCard}
+                                onClick={() => onViolationClick?.(v.violation)}
+                            >
                                 <div className={styles.violationMain}>
                                     <span className={styles.rankBadge}>#{index + 1}</span>
                                     <div className={styles.violationContent}>
@@ -70,11 +77,11 @@ export default function CriticalViolations({
                                         </div>
 
                                         <div className={styles.agentBreakdown}>
-                                            <span className={styles.breakdownLabel}>Affected Agents:</span>
+                                            <span className={styles.breakdownLabel}>Affected Staff:</span>
                                             <div className={styles.agentList}>
                                                 {v.topAgents.map((agent, i) => (
                                                     <div key={i} className={styles.agentTag}>
-                                                        <span className={styles.agentName}>{agent.name}</span>
+                                                        <span className={styles.agentName}>{capitalizeName(agent.name)}</span>
                                                         <span className={styles.agentCount}>{agent.count}</span>
                                                     </div>
                                                 ))}

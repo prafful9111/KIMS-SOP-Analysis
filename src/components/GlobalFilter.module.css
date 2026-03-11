@@ -1,80 +1,112 @@
 .filterContainer {
     display: flex;
     align-items: center;
-    background-color: var(--color-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 12px 24px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-subtle);
-    gap: 16px;
-    flex-wrap: wrap;
+    background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    margin-bottom: 24px;
-}
-
-.divider {
-    width: 1px;
-    height: 24px;
-    background-color: var(--color-border);
-}
-
-.label {
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    font-weight: 500;
+    border-radius: var(--radius-md);
+    padding: 0 12px;
+    height: 48px;
+    gap: 0;
+    box-shadow: var(--shadow-subtle);
 }
 
 .filterGroup {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 0 12px;
+    height: 100%;
 }
 
-.filterGroup label {
-    font-size: 14px;
-    font-weight: 500;
+.icon {
     color: var(--color-text-secondary);
+    opacity: 0.7;
 }
 
-.select,
-.dateInput {
-    padding: 8px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-family: inherit;
-    font-size: 14px;
+.select {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--color-text-primary);
-    background-color: var(--color-surface);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    outline: none;
+    min-width: 120px;
+}
+
+.select:hover {
+    background-color: var(--color-background-alt);
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background-color: var(--color-border);
+    margin: 0;
 }
 
 .resetBtn {
-    background: transparent;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-family: inherit;
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    padding: 8px 12px;
-    outline: none;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-    cursor: pointer;
-    margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    margin-left: auto;
 }
 
-.select:focus,
-.dateInput:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(10, 166, 93, 0.1);
+.resetBtn:hover {
+    color: var(--color-primary);
+    background-color: var(--color-background-alt);
 }
 
-.select:hover,
-.dateInput:hover {
-    border-color: #d1d5db;
+.label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.dateInput {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+    outline: none;
+    background: var(--color-background-alt);
+}
+
+@media (max-width: 1024px) {
+    .filterContainer {
+        flex-direction: column;
+        height: auto;
+        padding: 12px;
+        align-items: stretch;
+    }
+    
+    .filterGroup {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .divider {
+        display: none;
+    }
+    
+    .resetBtn {
+        margin-left: 0;
+        margin-top: 8px;
+        justify-content: center;
+    }
 }

@@ -1,0 +1,159 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeInSlideUp 0.3s ease;
+}
+
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modalHeader h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+    background-color: var(--color-background-alt);
+    color: var(--color-text);
+}
+
+.modalBody {
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.loadingWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: var(--color-text-secondary);
+}
+
+.emptyState {
+    padding: 60px;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--color-background-alt);
+    padding: 12px 24px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-border);
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.tableRow {
+    transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+    background-color: var(--color-background-alt);
+}
+
+.callId {
+    font-family: monospace;
+    color: var(--color-text-secondary);
+}
+
+.agentName {
+    font-weight: 500;
+}
+
+.qualityTag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.tagExceptional { background: rgba(52, 199, 89, 0.15); color: #2ea546; }
+.tagProficient { background: rgba(0, 122, 255, 0.15); color: #006ce6; }
+.tagAverage { background: rgba(139, 149, 161, 0.15); color: #6b7582; }
+.tagWeak { background: rgba(255, 149, 0, 0.15); color: #d67f00; }
+.tagImmediate { background: rgba(255, 59, 48, 0.15); color: #d92c20; }
+
+.flagWarning {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--score-immediate);
+    font-weight: 500;
+}
+
+.flagClean {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+}

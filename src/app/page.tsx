@@ -8,18 +8,22 @@ import KPIGrid from "@/components/KPIGrid";
 import ScenarioComparison from "@/components/ScenarioComparison";
 import CoachingInterventions from "@/components/CoachingInterventions";
 import SOPDropoff from "@/components/SOPDropoff";
-import AdherenceDistribution from "@/components/AdherenceDistribution";
+import QualityInsights from "@/components/QualityInsights";
 import CriticalViolations from "@/components/CriticalViolations";
+import SessionListModal, { ModalFilterType } from "@/components/SessionListModal";
 
 export default function Dashboard() {
   const [selectedScenario, setSelectedScenario] = useState("all");
-  const [selectedAgent, setSelectedAgent] = useState("all");
+  const [selectedStaff, setSelectedStaff] = useState("all");
   const [dateRange, setDateRange] = useState("30d");
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [scenarioComparison, setScenarioComparison] = useState<any[]>([]);
   const [sopDropoff, setSopDropoff] = useState<any[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
+
+  // Modal State
+  const [modalFilter, setModalFilter] = useState<{ type: ModalFilterType; value?: string }>({ type: null });
 
   // Cache to store API responses keyed by filter params
   const cacheRef = React.useRef<Record<string, any>>({});
@@ -28,7 +32,7 @@ export default function Dashboard() {
     const abortController = new AbortController();
 
     const fetchData = async () => {
-      const cacheKey = `${selectedScenario}-${selectedAgent}-${dateRange}`;
+      const cacheKey = `${selectedScenario}-${selectedStaff}-${dateRange}`;
 
       // Serve from cache if available
       if (cacheRef.current[cacheKey]) {
@@ -45,7 +49,7 @@ export default function Dashboard() {
       try {
         const queryParams = new URLSearchParams({
           scenario: selectedScenario,
-          agent: selectedAgent,
+          agent: selectedStaff,
           dateRange: dateRange
         }).toString();
 
@@ -97,7 +101,7 @@ export default function Dashboard() {
     fetchData();
 
     return () => abortController.abort();
-  }, [selectedScenario, selectedAgent, dateRange]);
+  }, [selectedScenario, selectedStaff, dateRange]);
 
   return (
     <>
@@ -106,8 +110,8 @@ export default function Dashboard() {
         <GlobalFilter
           selectedScenario={selectedScenario}
           setSelectedScenario={setSelectedScenario}
-          selectedAgent={selectedAgent}
-          setSelectedAgent={setSelectedAgent}
+          selectedStaff={selectedStaff}
+          setSelectedStaff={setSelectedStaff}
           dateRange={dateRange}
           setDateRange={setDateRange}
         />
@@ -121,36 +125,49 @@ export default function Dashboard() {
             totalCriticalViolations={dashboardData?.totalCriticalViolations}
             adherenceCounts={dashboardData?.adherenceCounts}
             loading={loading}
+            onPositiveAdherenceClick={() => setModalFilter({ type: "positive" })}
+            onCriticalAlertsClick={() => setModalFilter({ type: "critical" })}
           />
         </div>
 
         <div className={styles.chartsGrid}>
           <ScenarioComparison scenarios={scenarioComparison} loading={loading} />
-          <AdherenceDistribution adherenceCounts={dashboardData?.adherenceCounts} loading={loading} />
+          <QualityInsights 
+            adherenceCounts={dashboardData?.adherenceCounts} 
+            loading={loading} 
+            onTagClick={(tag) => setModalFilter({ type: "tag", value: tag })}
+          />
         </div>
 
         <div className={styles.fullWidthRow}>
           <CriticalViolations
             topViolations={dashboardData?.topViolations}
             loading={loading}
-            selectedScenarioName={scenarioComparison.find(s => s.id === selectedScenario)?.name || "All Scenarios"}
+            selectedScenarioName={scenarioComparison.find(s => s.id === selectedScenario)?.name || "All Departments"}
+            onViolationClick={(violation) => setModalFilter({ type: "violation", value: violation })}
           />
-        </div>
-
-        <div className={styles.fullWidthRow}>
-          <CoachingInterventions agents={agents} loading={loading} />
         </div>
 
         <div className={styles.bottomRow}>
           <div className={styles.bottomRowGrid} style={{ gridTemplateColumns: '1fr' }}>
             <SOPDropoff
-              selectedScenario={scenarioComparison.find(s => s.id === selectedScenario)?.name || "All Scenarios"}
+              selectedScenario={scenarioComparison.find(s => s.id === selectedScenario)?.name || "All Departments"}
               steps={sopDropoff}
               loading={loading}
             />
           </div>
         </div>
       </main>
+
+      <SessionListModal
+        isOpen={modalFilter.type !== null}
+        onClose={() => setModalFilter({ type: null })}
+        filterType={modalFilter.type}
+        filterValue={modalFilter.value}
+        selectedScenario={selectedScenario}
+        selectedStaff={selectedStaff}
+        dateRange={dateRange}
+      />
     </>
   );
 }

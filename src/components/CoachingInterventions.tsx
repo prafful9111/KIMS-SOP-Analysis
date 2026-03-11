@@ -3,6 +3,7 @@
 import React from "react";
 import styles from "./CoachingInterventions.module.css";
 import { Users } from "lucide-react";
+import { capitalizeName } from "./GlobalFilter";
 
 interface AgentStat {
     id: string;
@@ -78,7 +79,7 @@ export default function CoachingInterventions({ agents = [], loading = false }: 
                                 <div className={styles.staffMeta}>
                                     <div className={styles.avatar}>{agent.name.charAt(0).toUpperCase()}</div>
                                     <div className={styles.staffInfo}>
-                                        <span className={styles.staffName}>{agent.name}</span>
+                                        <span className={styles.staffName}>{capitalizeName(agent.name)}</span>
                                         <span className={styles.staffRole}>
                                             {agent.analyzedSessions} sessions • {agent.totalSessions} total
                                         </span>
@@ -86,7 +87,7 @@ export default function CoachingInterventions({ agents = [], loading = false }: 
                                 </div>
 
                                 <div className={styles.issueInfo}>
-                                    <span className={styles.issueLabel}>Most Common Tag:</span>
+                                    <span className={styles.issueLabel}>Common Adherence:</span>
                                     <span className={styles.issueText}>{topTag ? topTag[0] : "—"}</span>
                                 </div>
 

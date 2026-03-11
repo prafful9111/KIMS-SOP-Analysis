@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, AlertCircle, FileText, X } from "lucide-react";
 import styles from "./AllCallsTable.module.css";
+import { capitalizeName } from "./GlobalFilter";
 
 interface SessionData {
     id: string;
@@ -19,19 +20,20 @@ interface SessionData {
 
 interface AllCallsTableProps {
     selectedScenario?: string;
-    selectedAgent?: string;
+    selectedStaff?: string;
     dateRange?: string;
 }
 
 export default function AllCallsTable({
     selectedScenario,
-    selectedAgent,
+    selectedStaff,
     dateRange = "all"
 }: AllCallsTableProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [calls, setCalls] = useState<SessionData[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCall, setSelectedCall] = useState<SessionData | null>(null);
+    const [activeTab, setActiveTab] = useState<'details' | 'evaluation'>('details');
 
     // Cache for session data
     const cacheRef = React.useRef<Record<string, SessionData[]>>({});
@@ -40,7 +42,7 @@ export default function AllCallsTable({
         const abortController = new AbortController();
 
         const fetchSessions = async () => {
-            const cacheKey = `${selectedScenario}-${selectedAgent}-${dateRange}`;
+            const cacheKey = `${selectedScenario}-${selectedStaff}-${dateRange}`;
 
             // Return cached data if available
             if (cacheRef.current[cacheKey]) {
@@ -52,11 +54,11 @@ export default function AllCallsTable({
             setLoading(true);
             try {
                 const params = new URLSearchParams();
-                if (selectedScenario && selectedScenario !== "all" && selectedScenario !== "All Scenarios") {
+                if (selectedScenario && selectedScenario !== "all" && selectedScenario !== "All Departments") {
                     params.append('scenario', selectedScenario);
                 }
-                if (selectedAgent && selectedAgent !== "all") {
-                    params.append('agent', selectedAgent);
+                if (selectedStaff && selectedStaff !== "all") {
+                    params.append('agent', selectedStaff);
                 }
                 params.append('dateRange', dateRange);
 
@@ -84,7 +86,7 @@ export default function AllCallsTable({
         fetchSessions();
 
         return () => abortController.abort();
-    }, [selectedScenario, selectedAgent, dateRange]);
+    }, [selectedScenario, selectedStaff, dateRange]);
 
     const filteredCalls = calls.filter(call => {
         const searchMatch = call.agent_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -113,7 +115,7 @@ export default function AllCallsTable({
                     <Search size={18} className={styles.searchIcon} />
                     <input
                         type="text"
-                        placeholder="Search by Agent Name or Call ID..."
+                        placeholder="Search by Staff Name or Call ID..."
                         className={styles.searchInput}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -127,10 +129,10 @@ export default function AllCallsTable({
                         <tr>
                             <th>Call ID</th>
                             <th>Date & Time</th>
-                            <th>Agent Name</th>
-                            <th>Scenario</th>
+                            <th>Staff Name</th>
+                            <th>Department</th>
                             <th>Duration</th>
-                            <th>Adherence Tag</th>
+                            <th>Adherence</th>
                             <th>Red Flags</th>
                             <th>Action</th>
                         </tr>
@@ -144,7 +146,7 @@ export default function AllCallsTable({
                             <tr key={call.id} className={styles.tableRow} onClick={() => setSelectedCall(call)}>
                                 <td className={styles.callId}>{call.id.substring(0, 8)}</td>
                                 <td className={styles.dateCell}>{new Date(call.created_at).toLocaleString()}</td>
-                                <td><span className={styles.agentName}>{call.agent_name}</span></td>
+                                <td><span className={styles.agentName}>{capitalizeName(call.agent_name)}</span></td>
                                 <td><span className={styles.scenarioBadge}>{call.scenario_name}</span></td>
                                 <td className={styles.durationCell}>{call.duration || "N/A"}</td>
                                 <td>
@@ -187,40 +189,73 @@ export default function AllCallsTable({
                             <h3>Call Details: {selectedCall.id.substring(0, 8)}</h3>
                             <button className={styles.closeBtn} onClick={() => setSelectedCall(null)}><X size={20} /></button>
                         </div>
+                        <div className={styles.tabsContainer}>
+                            <button 
+                                className={`${styles.modalTab} ${activeTab === 'details' ? styles.active : ''}`}
+                                onClick={() => setActiveTab('details')}
+                            >
+                                Call Details
+                            </button>
+                            <button 
+                                className={`${styles.modalTab} ${activeTab === 'evaluation' ? styles.active : ''}`}
+                                onClick={() => setActiveTab('evaluation')}
+                            >
+                                Staff Evaluation
+                            </button>
+                        </div>
                         <div className={styles.modalBody}>
-                            <div className={styles.modalSection}>
-                                <h4>Agent Information</h4>
-                                <p><strong>Name:</strong> {selectedCall.agent_name}</p>
-                                <p><strong>Scenario:</strong> {selectedCall.scenario_name}</p>
-                                <p><strong>Date / Time:</strong> {new Date(selectedCall.created_at).toLocaleString()}</p>
-                                <p className={styles.marginTop}><strong>Adherence Tag:</strong> <span className={`${styles.qualityTagModal} ${getTagClass(selectedCall.adherence_tag)}`}>{selectedCall.adherence_tag || "Unknown"}</span></p>
-                            </div>
-                            <div className={styles.modalSection}>
-                                <h4>Critical Violations Identified ({selectedCall.red_flags_count})</h4>
-                                {selectedCall.red_flags_count > 0 ? (
-                                    <ul className={styles.violationList}>
-                                        {selectedCall.red_flags.map((flag, i) => (
-                                            <li key={i}>{flag}</li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className={styles.cleanText}>✓ No critical red flags detected during this interaction. Excellent execution.</p>
-                                )}
-                            </div>
-                            <div className={styles.modalSection}>
-                                <h4>Call Transcript</h4>
-                                <div className={styles.transcriptContainer}>
-                                    {selectedCall.transcript ? (
-                                        <div className={styles.transcriptText}>
-                                            {selectedCall.transcript.split('\n').map((line, i) => (
-                                                <p key={i} className={styles.transcriptLine}>{line}</p>
-                                            ))}
+                            {activeTab === 'details' ? (
+                                <>
+                                    <div className={styles.modalSection}>
+                                        <h4>Staff Information</h4>
+                                        <p><strong>Name:</strong> {capitalizeName(selectedCall.agent_name)}</p>
+                                        <p><strong>Department:</strong> {selectedCall.scenario_name}</p>
+                                        <p><strong>Date / Time:</strong> {new Date(selectedCall.created_at).toLocaleString()}</p>
+                                        <p><strong>Duration:</strong> {selectedCall.duration || "N/A"}</p>
+                                    </div>
+                                    <div className={styles.modalSection}>
+                                        <h4>Call Transcript</h4>
+                                        <div className={styles.transcriptContainer}>
+                                            {selectedCall.transcript ? (
+                                                <div className={styles.transcriptText}>
+                                                    {selectedCall.transcript.split('\n').map((line, i) => (
+                                                        <p key={i} className={styles.transcriptLine}>{line}</p>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className={styles.emptyTranscriptText}>No transcript available for this session.</p>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <p className={styles.emptyTranscriptText}>No transcript available for this session.</p>
-                                    )}
-                                </div>
-                            </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className={styles.modalSection}>
+                                        <h4>Overall Evaluation</h4>
+                                        <p><strong>Adherence Tag:</strong> <span className={`${styles.qualityTagModal} ${getTagClass(selectedCall.adherence_tag)}`}>{selectedCall.adherence_tag || "Unknown"}</span></p>
+                                        <div className={styles.marginTop}>
+                                            <strong>Call Summary:</strong>
+                                            {selectedCall.summary ? (
+                                                <div className={styles.summaryText}>{selectedCall.summary}</div>
+                                            ) : (
+                                                <p className={styles.cleanText}>No summary available for this session.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className={styles.modalSection}>
+                                        <h4>Critical Alerts & Missing Steps ({selectedCall.red_flags_count})</h4>
+                                        {selectedCall.red_flags_count > 0 ? (
+                                            <ul className={styles.violationList}>
+                                                {selectedCall.red_flags.map((flag, i) => (
+                                                    <li key={i}>{flag}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className={styles.cleanText}>✓ Excellent execution. No critical alerts or missed steps found.</p>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

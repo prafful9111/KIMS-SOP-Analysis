@@ -57,9 +57,9 @@ export default function ScenarioComparison({ scenarios = [], loading = false }: 
     return (
         <div className={styles.card}>
             <div className={styles.header}>
-                <h2 className={styles.title}>Scenario Performance Comparison</h2>
+                <h2 className={styles.title}>Departments Performance Comparison</h2>
                 <span className={styles.subtitle}>
-                    {loading ? "Loading metrics..." : chartData.length > 0 ? "SOP compliance rate by scenario" : "No call data available for the selected filters"}
+                    {loading ? "Loading metrics..." : chartData.length > 0 ? "SOP compliance rate by department" : "No call data available for the selected filters"}
                 </span>
             </div>
 

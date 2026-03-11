@@ -25,7 +25,7 @@ export default function SOPDropoff({ selectedScenario, steps = [], loading = fal
             <div className={styles.header}>
                 <h3 className={styles.title}>Granular SOP Execution Status</h3>
                 <span className={styles.subtitle}>
-                    {selectedScenario === "All Scenarios"
+                    {selectedScenario === "All Departments"
                         ? "Granular execution breakdown across all sessions"
                         : `Step-by-step compliance for ${selectedScenario}`}
                 </span>
@@ -73,7 +73,7 @@ export default function SOPDropoff({ selectedScenario, steps = [], loading = fal
                                     <td>
                                         <div className={styles.stepInfo}>
                                             <span className={styles.stepNumber}>{index + 1}</span>
-                                            <span className={styles.stepText}>{item.step}</span>
+                                            <span className={styles.stepText}>{item.step.replace(/^\d+[\.\:\-]?\s*/, '')}</span>
                                         </div>
                                     </td>
                                     <td className={styles.centerCol}>
