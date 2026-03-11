@@ -116,6 +116,7 @@ export default function Dashboard() {
           <KPIGrid
             totalSessions={dashboardData?.totalSessions}
             analyzedSessions={dashboardData?.analyzedSessions}
+            sessionTrend={dashboardData?.sessionTrend}
             sopComplianceRate={dashboardData?.sopComplianceRate}
             totalCriticalViolations={dashboardData?.totalCriticalViolations}
             adherenceCounts={dashboardData?.adherenceCounts}

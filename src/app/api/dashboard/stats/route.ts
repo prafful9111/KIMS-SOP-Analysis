@@ -78,6 +78,75 @@ export async function GET(req: any) {
         const analyzedSessions = sessions.length;
         console.log(`[/api/dashboard/stats] Fetched ${analyzedSessions} sessions`);
 
+        // --- TREND CALCULATION ---
+        let trendLabel = "vs previous day";
+        const oneDay = 24 * 60 * 60 * 1000;
+        const now = new Date();
+        let curTrendStart: Date, curTrendEnd: Date | undefined;
+        let prevTrendStart: Date, prevTrendEnd: Date;
+
+        if (dateRange === '1d') {
+            curTrendStart = new Date(now.getTime() - oneDay);
+            prevTrendStart = new Date(now.getTime() - 2 * oneDay);
+            prevTrendEnd = curTrendStart;
+            trendLabel = "vs previous day";
+        } else if (dateRange === 'yesterday') {
+            curTrendStart = new Date(now);
+            curTrendStart.setDate(now.getDate() - 1);
+            curTrendStart.setHours(0, 0, 0, 0);
+            curTrendEnd = new Date(curTrendStart);
+            curTrendEnd.setDate(curTrendEnd.getDate() + 1);
+
+            prevTrendStart = new Date(curTrendStart);
+            prevTrendStart.setDate(prevTrendStart.getDate() - 1);
+            prevTrendEnd = curTrendStart;
+            trendLabel = "vs previous day";
+        } else if (dateRange === '7d') {
+            curTrendStart = new Date(now.getTime() - 7 * oneDay);
+            prevTrendStart = new Date(now.getTime() - 14 * oneDay);
+            prevTrendEnd = curTrendStart;
+            trendLabel = "vs previous 7 days";
+        } else if (dateRange === '30d') {
+            curTrendStart = new Date(now.getTime() - 30 * oneDay);
+            prevTrendStart = new Date(now.getTime() - 60 * oneDay);
+            prevTrendEnd = curTrendStart;
+            trendLabel = "vs previous 30 days";
+        } else {
+            curTrendStart = new Date(now.getTime() - oneDay);
+            prevTrendStart = new Date(now.getTime() - 2 * oneDay);
+            prevTrendEnd = curTrendStart;
+            trendLabel = "vs previous day";
+        }
+
+        const baseTrendWhere: any = {
+            analysis_json: { not: Prisma.DbNull },
+            scenario_id: { in: allowedScenarioIds }
+        };
+        if (scenarioId && scenarioId !== 'all') baseTrendWhere.scenario_id = scenarioId;
+        if (agentId && agentId !== 'all') baseTrendWhere.user_id = agentId;
+
+        const curWhere = { ...baseTrendWhere, created_at: { gte: curTrendStart, ...(curTrendEnd ? { lt: curTrendEnd } : {}) } };
+        const curTrendTotal = await prisma.sessions.count({ where: curWhere });
+
+        const prevWhere = { ...baseTrendWhere, created_at: { gte: prevTrendStart, lt: prevTrendEnd } };
+        const prevTrendTotal = await prisma.sessions.count({ where: prevWhere });
+
+        let trendPercentage = 0;
+        if (prevTrendTotal > 0) {
+            trendPercentage = Math.round(((curTrendTotal - prevTrendTotal) / prevTrendTotal) * 100);
+        } else if (curTrendTotal > 0) {
+            trendPercentage = 100;
+        }
+
+        const sessionTrend = {
+            percentage: trendPercentage,
+            label: trendLabel,
+            isPositive: trendPercentage >= 0,
+            value: curTrendTotal - prevTrendTotal
+        };
+        // -------------------------
+
+
         // Adherence tag distribution
         const adherenceCounts: Record<string, number> = {};
         let totalSteps = 0;
@@ -139,6 +208,7 @@ export async function GET(req: any) {
         return NextResponse.json({
             totalSessions,
             analyzedSessions,
+            sessionTrend,
             adherenceCounts,
             sopComplianceRate,
             totalCriticalViolations,

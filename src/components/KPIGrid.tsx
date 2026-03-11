@@ -5,6 +5,12 @@ import { FileText, Activity, CheckCircle, AlertOctagon, TrendingUp, TrendingDown
 interface KPIGridProps {
     totalSessions?: number;
     analyzedSessions?: number;
+    sessionTrend?: {
+        percentage: number;
+        label: string;
+        isPositive: boolean;
+        value: number;
+    };
     sopComplianceRate?: number;
     totalCriticalViolations?: number;
     adherenceCounts?: Record<string, number>;
@@ -14,6 +20,7 @@ interface KPIGridProps {
 export default function KPIGrid({
     totalSessions = 0,
     analyzedSessions = 0,
+    sessionTrend,
     sopComplianceRate = 0,
     totalCriticalViolations = 0,
     adherenceCounts = {},
@@ -44,16 +51,32 @@ export default function KPIGrid({
         <div style={{ display: "contents" }}>
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <span className={styles.cardTitle}>Sessions Recorded</span>
+                    <span className={styles.cardTitle}>Total Sessions Analyzed</span>
                     <div className={styles.iconWrapper}>
                         <FileText size={20} />
                     </div>
                 </div>
-                <div className={styles.cardValue}>{totalSessions.toLocaleString()}</div>
+                <div className={styles.cardValue}>{analyzedSessions.toLocaleString()}</div>
                 <div className={styles.trend}>
-                    <span style={{ color: "var(--color-text-secondary)" }}>
-                        {analyzedSessions} total sessions
-                    </span>
+                    {sessionTrend ? (
+                        <>
+                            {sessionTrend.isPositive ? (
+                                <TrendingUp size={16} className={styles.trendPositive} />
+                            ) : (
+                                <TrendingDown size={16} className={styles.trendNegative} />
+                            )}
+                            <span className={sessionTrend.isPositive ? styles.trendPositive : styles.trendNegative} style={{ marginRight: '6px' }}>
+                                {sessionTrend.isPositive ? '+' : ''}{sessionTrend.percentage}%
+                            </span>
+                            <span style={{ color: "var(--color-text-secondary)" }}>
+                                {sessionTrend.label}
+                            </span>
+                        </>
+                    ) : (
+                        <span style={{ color: "var(--color-text-secondary)" }}>
+                            Analyzing trends...
+                        </span>
+                    )}
                 </div>
             </div>
 
