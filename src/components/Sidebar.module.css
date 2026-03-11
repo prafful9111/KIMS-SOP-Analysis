@@ -27,9 +27,27 @@
 .logoContainer {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
     overflow: hidden;
-    white-space: nowrap;
+    width: 100%;
+}
+
+.logoImage {
+    max-height: 48px;
+    max-width: 180px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.logoImageCollapsed {
+    max-height: 40px;
+    max-width: 40px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .logoImage {
+    max-width: 40px;
 }
 
 .logoText {

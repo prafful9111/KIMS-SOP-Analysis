@@ -23,8 +23,14 @@ export async function GET(req: any) {
             select: { id: true, name: true, email: true },
         });
 
-        const where: any = { analysis_json: { not: Prisma.DbNull } };
-        const sessionCountWhere: any = {};
+        const allowedScenarioIds = ['5', '6', 'd25f37c0-7a5c-4a8d-93b9-c75ec59c0bcd'];
+        const where: any = { 
+            analysis_json: { not: Prisma.DbNull },
+            scenario_id: { in: allowedScenarioIds }
+        };
+        const sessionCountWhere: any = {
+            scenario_id: { in: allowedScenarioIds }
+        };
 
         if (scenarioId && scenarioId !== 'all') {
             where.scenario_id = scenarioId;

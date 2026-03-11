@@ -27,8 +27,14 @@ export async function GET(req: any) {
         const agentId = searchParams.get('agent');
         const dateRange = searchParams.get('dateRange') ?? 'all';
 
-        const where: any = { analysis_json: { not: Prisma.DbNull } };
-        const countWhere: any = {};
+        const allowedScenarioIds = ['5', '6', 'd25f37c0-7a5c-4a8d-93b9-c75ec59c0bcd'];
+        const where: any = { 
+            analysis_json: { not: Prisma.DbNull },
+            scenario_id: { in: allowedScenarioIds }
+        };
+        const countWhere: any = {
+            scenario_id: { in: allowedScenarioIds }
+        };
 
         if (scenarioId && scenarioId !== 'all') {
             where.scenario_id = scenarioId;

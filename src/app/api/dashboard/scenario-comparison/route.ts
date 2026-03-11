@@ -22,9 +22,10 @@ export async function GET(req: any) {
         const agentId = searchParams.get('agent');
         const dateRange = searchParams.get('dateRange') ?? 'all';
 
+        const allowedScenarioIds = ['5', '6', 'd25f37c0-7a5c-4a8d-93b9-c75ec59c0bcd'];
         const where: any = {
             analysis_json: { not: Prisma.DbNull },
-            scenario_id: { not: null }
+            scenario_id: { in: allowedScenarioIds }
         };
 
         if (scenarioIdParam && scenarioIdParam !== 'all') {

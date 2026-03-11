@@ -26,6 +26,14 @@ interface ScenarioComparisonProps {
     loading?: boolean;
 }
 
+function SkeletonBar() {
+    const [height, setHeight] = React.useState("60%");
+    React.useEffect(() => {
+        setHeight(`${Math.random() * 60 + 20}%`);
+    }, []);
+    return <div className={`${styles.skeletonBar} skeleton`} style={{ height }}></div>;
+}
+
 export default function ScenarioComparison({ scenarios = [], loading = false }: ScenarioComparisonProps) {
     const getBarColor = (score: number) => {
         if (score >= 90) return "var(--score-exceptional)";
@@ -58,9 +66,9 @@ export default function ScenarioComparison({ scenarios = [], loading = false }: 
             <div className={`${styles.chartContainer} ${loading ? styles.loading : ""}`}>
                 {loading ? (
                     <div className={styles.skeletonContainer}>
-                        {[1, 2, 3, 4, 5].map(i => (
+                        {Array.from({ length: 5 }).map((_, i) => (
                             <div key={i} className={styles.skeletonBarWrapper}>
-                                <div className={`${styles.skeletonBar} skeleton`} style={{ height: `${Math.random() * 60 + 20}%` }}></div>
+                                <SkeletonBar />
                                 <div className={`${styles.skeletonLabel} skeleton`}></div>
                             </div>
                         ))}

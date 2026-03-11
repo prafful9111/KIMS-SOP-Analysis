@@ -14,10 +14,11 @@ export default function Sidebar() {
         <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
             <div className={styles.topSection}>
                 <div className={styles.logoContainer}>
-                    <Activity className={styles.logoIcon} size={28} />
-                    <div className={styles.logoText}>
-                        KIMS <span>HOSPITALS&trade;</span>
-                    </div>
+                    <img 
+                        src={collapsed ? "/KIMSpng.jpeg" : "/KIMSpng.png"} 
+                        alt="KIMS logo" 
+                        className={collapsed ? styles.logoImageCollapsed : styles.logoImage} 
+                    />
                 </div>
                 <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)}>
                     {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
