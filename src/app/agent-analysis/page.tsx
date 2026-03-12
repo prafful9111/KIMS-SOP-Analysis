@@ -23,6 +23,8 @@ interface Agent {
     adherenceCounts: Record<string, number>;
     totalViolations: number;
     avgComplianceRate: number;
+    highestViolationType?: string;
+    topStrength?: string;
 }
 
 export default function StaffAnalysisPage() {
@@ -143,6 +145,30 @@ export default function StaffAnalysisPage() {
         return { label: "Low", class: styles.priorityLow };
     };
 
+    // --- Actionable Reps (High Priority, low accuracy, or failing) ---
+    const actionableReps = teamAnalyzed
+        .filter(a => {
+            const priority = getPriorityLabel(a);
+            // Include high priority OR bottom 25% accuracy OR high violations
+            return priority.label === "High" || a.avgComplianceRate < 70 || a.totalViolations > 1;
+        })
+        .sort((a, b) => {
+            // Primarily show those with the most red flags
+            if (b.totalViolations !== a.totalViolations) return b.totalViolations - a.totalViolations;
+            // Then by lowest compliance rate
+            return a.avgComplianceRate - b.avgComplianceRate;
+        })
+        .slice(0, 5);
+
+    // --- Best and Worst Performers ---
+    const bestPerformers = teamAnalyzed
+        .sort((a, b) => b.avgComplianceRate - a.avgComplianceRate)
+        .slice(0, 3);
+
+    const worstPerformers = teamAnalyzed
+        .sort((a, b) => a.avgComplianceRate - b.avgComplianceRate)
+        .slice(0, 3);
+
     return (
         <>
             <Header title="SOP Compliance & Quality Overview" />
@@ -214,6 +240,78 @@ export default function StaffAnalysisPage() {
                                 <div className={styles.rewardSubtext}>of sessions analyzed</div>
                             </>
                         )}
+                    </div>
+                </div>
+
+                <div className={styles.analysisGrid}>
+                    <div className={styles.analysisSection}>
+                        <div className={styles.sectionHeader}>
+                            <ShieldAlert size={18} color="var(--score-immediate)" />
+                            <div className={styles.headerInfo}>
+                                <h3>Actionable Reps</h3>
+                                <span className={styles.statHint}>Agents with low accuracy or red flags</span>
+                            </div>
+                        </div>
+                        <div className={styles.actionableList}>
+                            {teamLoading ? [1, 2].map(i => <div key={i} className="skeleton" style={{ height: '70px', marginBottom: '12px' }}></div>) : 
+                             actionableReps.length > 0 ? actionableReps.map(rep => (
+                                <div key={rep.id} className={styles.actionableItem}>
+                                    <div className={styles.repInfo}>
+                                        <span className={styles.repName}>{capitalizeName(rep.name)}</span>
+                                        <div className={styles.repStats}>
+                                            <span className={styles.repMetric}>{rep.totalViolations} Red Flags</span>
+                                            <span className={styles.repDivider}>•</span>
+                                            <span className={styles.repMetric}>{rep.avgComplianceRate}% Accuracy</span>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        className={styles.coachBtn}
+                                        onClick={() => {
+                                            setModalAgentId(rep.id);
+                                            setIsModalOpen(true);
+                                        }}
+                                    >
+                                        Review
+                                    </button>
+                                </div>
+                            )) : <p className={styles.emptyText}>No immediate action required for this selection.</p>}
+                        </div>
+                    </div>
+
+                    <div className={styles.analysisSection}>
+                        <div className={styles.sectionHeader}>
+                            <Trophy size={18} color="#F9AB00" />
+                            <div className={styles.headerInfo}>
+                                <h3>Top Performers</h3>
+                                <span className={styles.statHint}>Highest accuracy across analyzed sessions</span>
+                            </div>
+                        </div>
+                        <div className={styles.perfComparison}>
+                            <div className={styles.perfColumn}>
+                                {bestPerformers.length > 0 ? bestPerformers.map(a => (
+                                    <div key={a.id} className={styles.miniAgentCard}>
+                                        <div className={styles.repInfo}>
+                                            <div className={styles.agentRank}>
+                                                <div className={styles.trendUp}>↑</div>
+                                                <span className={styles.repName}>{capitalizeName(a.name)}</span>
+                                            </div>
+                                            <div className={styles.repStats}>
+                                                <span className={styles.agentScore} style={{ color: '#1B813E' }}>{a.avgComplianceRate}% Accuracy</span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            className={styles.coachBtn}
+                                            onClick={() => {
+                                                setModalAgentId(a.id);
+                                                setIsModalOpen(true);
+                                            }}
+                                        >
+                                            Review
+                                        </button>
+                                    </div>
+                                )) : <p className={styles.emptyText}>No data available.</p>}
+                            </div>
+                        </div>
                     </div>
                 </div>
 

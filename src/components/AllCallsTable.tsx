@@ -34,6 +34,19 @@ export default function AllCallsTable({
     const [loading, setLoading] = useState(true);
     const [selectedCall, setSelectedCall] = useState<SessionData | null>(null);
     const [activeTab, setActiveTab] = useState<'details' | 'evaluation'>('details');
+    const [scoreSortOrder, setScoreSortOrder] = useState<'none' | 'high-to-low' | 'low-to-high'>('none');
+
+    // Score mapping for sorting
+    const scoreMap: Record<string, number> = {
+        "Exceptional": 5,
+        "Proficient": 4,
+        "Good": 4,
+        "Average": 3,
+        "Developmental": 2,
+        "Weak": 2,
+        "Immediate Action": 1,
+        "Very Weak": 1,
+    };
 
     // Cache for session data
     const cacheRef = React.useRef<Record<string, SessionData[]>>({});
@@ -88,11 +101,24 @@ export default function AllCallsTable({
         return () => abortController.abort();
     }, [selectedScenario, selectedStaff, dateRange]);
 
-    const filteredCalls = calls.filter(call => {
-        const searchMatch = call.agent_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            call.id.toLowerCase().includes(searchTerm.toLowerCase());
-        return searchMatch;
-    });
+    const filteredCalls = calls
+        .filter(call => {
+            const searchMatch = call.agent_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                call.id.toLowerCase().includes(searchTerm.toLowerCase());
+            return searchMatch;
+        })
+        .sort((a, b) => {
+            if (scoreSortOrder === 'none') return 0;
+
+            const scoreA = scoreMap[a.adherence_tag || ""] || 0;
+            const scoreB = scoreMap[b.adherence_tag || ""] || 0;
+
+            if (scoreSortOrder === 'high-to-low') {
+                return scoreB - scoreA;
+            } else {
+                return scoreA - scoreB;
+            }
+        });
 
     const getTagClass = (tag?: string) => {
         switch (tag) {
@@ -120,6 +146,18 @@ export default function AllCallsTable({
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                </div>
+                <div className={styles.filterWrapper}>
+                    <span className={styles.filterLabel}>Sort by Score:</span>
+                    <select
+                        className={styles.scoreSelect}
+                        value={scoreSortOrder}
+                        onChange={(e) => setScoreSortOrder(e.target.value as any)}
+                    >
+                        <option value="none">All Scores</option>
+                        <option value="high-to-low">Highest First</option>
+                        <option value="low-to-high">Lowest First</option>
+                    </select>
                 </div>
             </div>
 
@@ -190,13 +228,13 @@ export default function AllCallsTable({
                             <button className={styles.closeBtn} onClick={() => setSelectedCall(null)}><X size={20} /></button>
                         </div>
                         <div className={styles.tabsContainer}>
-                            <button 
+                            <button
                                 className={`${styles.modalTab} ${activeTab === 'details' ? styles.active : ''}`}
                                 onClick={() => setActiveTab('details')}
                             >
                                 Call Details
                             </button>
-                            <button 
+                            <button
                                 className={`${styles.modalTab} ${activeTab === 'evaluation' ? styles.active : ''}`}
                                 onClick={() => setActiveTab('evaluation')}
                             >

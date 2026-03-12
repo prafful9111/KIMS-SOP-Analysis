@@ -10,7 +10,8 @@ const connectionString = process.env.DATABASE_URL || "postgresql://postgres:post
 const prismaClientSingleton = () => {
     let url: URL;
     try {
-        const baseConnString = connectionString.split('?')[0];
+        const sanitizedConnString = connectionString.replace(/^"|"$/g, '');
+        const baseConnString = sanitizedConnString.split('?')[0];
         url = new URL(baseConnString);
     } catch (e) {
         console.error("Prisma: Invalid DATABASE_URL", e);

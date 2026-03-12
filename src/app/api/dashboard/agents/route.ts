@@ -43,20 +43,25 @@ export async function GET(req: any) {
 
         if (dateRange !== 'all') {
             const now = new Date();
-            let dateFilter: Date | undefined;
-            if (dateRange === '1d') dateFilter = new Date(now.setDate(now.getDate() - 1));
-            else if (dateRange === 'yesterday') {
-                const start = new Date(now);
-                start.setDate(now.getDate() - 1);
-                start.setHours(0, 0, 0, 0);
-                dateFilter = start;
-            }
-            else if (dateRange === '7d') dateFilter = new Date(now.setDate(now.getDate() - 7));
-            else if (dateRange === '30d') dateFilter = new Date(now.setDate(now.getDate() - 30));
+            const startOfToday = new Date(now);
+            startOfToday.setHours(0, 0, 0, 0);
 
-            if (dateFilter) {
-                where.created_at = { gte: dateFilter };
-                sessionCountWhere.created_at = { gte: dateFilter };
+            if (dateRange === '1d') {
+                where.created_at = { gte: startOfToday };
+                sessionCountWhere.created_at = { gte: startOfToday };
+            } else if (dateRange === 'yesterday') {
+                const startOfYesterday = new Date(startOfToday);
+                startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+                where.created_at = { gte: startOfYesterday, lt: startOfToday };
+                sessionCountWhere.created_at = { gte: startOfYesterday, lt: startOfToday };
+            } else if (dateRange === '7d') {
+                const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                where.created_at = { gte: sevenDaysAgo };
+                sessionCountWhere.created_at = { gte: sevenDaysAgo };
+            } else if (dateRange === '30d') {
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                where.created_at = { gte: thirtyDaysAgo };
+                sessionCountWhere.created_at = { gte: thirtyDaysAgo };
             }
         }
 
@@ -84,6 +89,8 @@ export async function GET(req: any) {
             adherenceCounts: Record<string, number>;
             totalViolations: number;
             avgComplianceRate: number;
+            _totalSteps: number;
+            _completedSteps: number;
         }> = {};
 
         // Initialize only requested user if filtered
@@ -101,6 +108,8 @@ export async function GET(req: any) {
                 adherenceCounts: {},
                 totalViolations: 0,
                 avgComplianceRate: 0,
+                _totalSteps: 0,
+                _completedSteps: 0,
             };
         }
 
@@ -121,18 +130,21 @@ export async function GET(req: any) {
             entry.totalViolations += (analysis.result.critical_violations_or_red_flags ?? []).length;
 
             const checklist = analysis.result.sop_adherence_checklist ?? [];
-            let total = 0, completed = 0;
             for (const step of checklist) {
                 if (step.status === 'N/A') continue;
-                total++;
-                if (step.status === 'Completed') completed++;
-            }
-            if (total > 0) {
-                entry.avgComplianceRate = Math.round((completed / total) * 100);
+                entry._totalSteps++;
+                if (step.status === 'Completed') entry._completedSteps++;
             }
         }
 
-        const agents = Object.values(agentMap).sort((a, b) => b.totalSessions - a.totalSessions);
+        const agents = Object.values(agentMap).map(agent => {
+            if (agent._totalSteps > 0) {
+                agent.avgComplianceRate = Math.round((agent._completedSteps / agent._totalSteps) * 100);
+            }
+            // Clean up internal props before sending to client
+            const { _totalSteps, _completedSteps, ...rest } = agent;
+            return rest;
+        }).sort((a, b) => b.totalSessions - a.totalSessions);
 
         return NextResponse.json({ agents });
     } catch (error) {

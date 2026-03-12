@@ -47,21 +47,25 @@ export async function GET(req: any) {
 
         if (dateRange !== 'all') {
             const now = new Date();
-            let dateFilter: Date | undefined;
-            if (dateRange === '1d') dateFilter = new Date(now.setDate(now.getDate() - 1));
-            else if (dateRange === 'yesterday') {
-                const start = new Date(now);
-                start.setDate(now.getDate() - 1);
-                start.setHours(0, 0, 0, 0);
-                dateFilter = start;
-                // For 'yesterday' we might want a range [start, end], but usually gte is enough for "since yesterday"
-            }
-            else if (dateRange === '7d') dateFilter = new Date(now.setDate(now.getDate() - 7));
-            else if (dateRange === '30d') dateFilter = new Date(now.setDate(now.getDate() - 30));
+            const startOfToday = new Date(now);
+            startOfToday.setHours(0, 0, 0, 0);
 
-            if (dateFilter) {
-                where.created_at = { gte: dateFilter };
-                countWhere.created_at = { gte: dateFilter };
+            if (dateRange === '1d') {
+                where.created_at = { gte: startOfToday };
+                countWhere.created_at = { gte: startOfToday };
+            } else if (dateRange === 'yesterday') {
+                const startOfYesterday = new Date(startOfToday);
+                startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+                where.created_at = { gte: startOfYesterday, lt: startOfToday };
+                countWhere.created_at = { gte: startOfYesterday, lt: startOfToday };
+            } else if (dateRange === '7d') {
+                const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                where.created_at = { gte: sevenDaysAgo };
+                countWhere.created_at = { gte: sevenDaysAgo };
+            } else if (dateRange === '30d') {
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                where.created_at = { gte: thirtyDaysAgo };
+                countWhere.created_at = { gte: thirtyDaysAgo };
             }
         }
 

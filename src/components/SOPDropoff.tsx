@@ -35,7 +35,7 @@ export default function SOPDropoff({ selectedScenario, steps = [], loading = fal
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>SOP Step Description</th>
+                            <th>SOP Step</th>
                             <th className={styles.centerCol}>Completed</th>
                             <th className={styles.centerCol}>Incorrect</th>
                             <th className={styles.centerCol}>Missed</th>

@@ -20,31 +20,36 @@ export async function GET(req: NextRequest) {
         const limit = parseInt(searchParams.get('limit') ?? '20');
         const search = searchParams.get('search') ?? '';
 
-        // Build date filter
-        let dateFilter: Date | undefined;
         const now = new Date();
+        const startOfToday = new Date(now);
+        startOfToday.setHours(0, 0, 0, 0);
+
+        const allowedScenarioIds = ['5', '6', 'd25f37c0-7a5c-4a8d-93b9-c75ec59c0bcd'];
+        const where: Record<string, any> = {
+            scenario_id: { in: allowedScenarioIds }
+        };
+
         if (dateRange === '1d') {
-            dateFilter = new Date(now.setDate(now.getDate() - 1));
+            where.created_at = { gte: startOfToday };
         } else if (dateRange === 'yesterday') {
-            const start = new Date(now);
-            start.setDate(now.getDate() - 1);
-            start.setHours(0, 0, 0, 0);
-            dateFilter = start;
+            const startOfYesterday = new Date(startOfToday);
+            startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+            where.created_at = { gte: startOfYesterday, lt: startOfToday };
         } else if (dateRange === '7d') {
-            dateFilter = new Date(now.setDate(now.getDate() - 7));
+            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            where.created_at = { gte: sevenDaysAgo };
         } else if (dateRange === '30d') {
-            dateFilter = new Date(now.setDate(now.getDate() - 30));
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            where.created_at = { gte: thirtyDaysAgo };
         }
 
-        const where: Record<string, any> = {};
         if (scenarioId && scenarioId !== 'all') {
-            where.scenario_id = scenarioId;
+            if (allowedScenarioIds.includes(scenarioId)) {
+                where.scenario_id = scenarioId;
+            }
         }
         if (agentId && agentId !== 'all') {
             where.user_id = agentId;
-        }
-        if (dateFilter) {
-            where.created_at = { gte: dateFilter };
         }
 
         if (search) {
