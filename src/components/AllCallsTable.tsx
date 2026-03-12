@@ -16,6 +16,8 @@ interface SessionData {
     summary: string;
     duration?: string;
     transcript?: string;
+    audio_files?: { id: string, url: string, order: number }[];
+    sop_adherence_checklist?: { step: string, status: string, notes: string }[];
 }
 
 interface AllCallsTableProps {
@@ -33,7 +35,8 @@ export default function AllCallsTable({
     const [calls, setCalls] = useState<SessionData[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCall, setSelectedCall] = useState<SessionData | null>(null);
-    const [activeTab, setActiveTab] = useState<'details' | 'evaluation'>('details');
+    const [modalLoading, setModalLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState<'details' | 'evaluation' | 'sop'>('details');
     const [scoreSortOrder, setScoreSortOrder] = useState<'none' | 'high-to-low' | 'low-to-high'>('none');
 
     // Score mapping for sorting
@@ -169,7 +172,6 @@ export default function AllCallsTable({
                             <th>Date & Time</th>
                             <th>Staff Name</th>
                             <th>Department</th>
-                            <th>Duration</th>
                             <th>Adherence</th>
                             <th>Red Flags</th>
                             <th>Action</th>
@@ -181,12 +183,39 @@ export default function AllCallsTable({
                                 <td colSpan={8} className={styles.emptyState}>Loading sessions...</td>
                             </tr>
                         ) : filteredCalls.length > 0 ? filteredCalls.map((call) => (
-                            <tr key={call.id} className={styles.tableRow} onClick={() => setSelectedCall(call)}>
+                            <tr 
+                                key={call.id} 
+                                className={styles.tableRow} 
+                                onClick={async () => {
+                                    setSelectedCall(call);
+                                    setModalLoading(true);
+                                    try {
+                                        const res = await fetch(`/api/dashboard/sessions/${call.id}`);
+                                        if (res.ok) {
+                                            const data = await res.json();
+                                            const session = data.session;
+                                            
+                                            // Extract SOP checklist from analysis_json
+                                            const checklist = session.analysis_json?.result?.sop_adherence_checklist || [];
+                                            
+                                            setSelectedCall({
+                                                ...call,
+                                                audio_files: session.audio_files,
+                                                sop_adherence_checklist: checklist,
+                                                transcript: session.transcript || call.transcript
+                                            });
+                                        }
+                                    } catch (err) {
+                                        console.error("Failed to fetch session details", err);
+                                    } finally {
+                                        setModalLoading(false);
+                                    }
+                                }}
+                            >
                                 <td className={styles.callId}>{call.id.substring(0, 8)}</td>
                                 <td className={styles.dateCell}>{new Date(call.created_at).toLocaleString()}</td>
                                 <td><span className={styles.agentName}>{capitalizeName(call.agent_name)}</span></td>
                                 <td><span className={styles.scenarioBadge}>{call.scenario_name}</span></td>
-                                <td className={styles.durationCell}>{call.duration || "N/A"}</td>
                                 <td>
                                     <span className={`${styles.qualityTag} ${getTagClass(call.adherence_tag)}`}>
                                         {call.adherence_tag || "Unknown"}
@@ -240,32 +269,87 @@ export default function AllCallsTable({
                             >
                                 Staff Evaluation
                             </button>
+                            <button
+                                className={`${styles.modalTab} ${activeTab === 'sop' ? styles.active : ''}`}
+                                onClick={() => setActiveTab('sop')}
+                            >
+                                SOP Adherence
+                            </button>
                         </div>
                         <div className={styles.modalBody}>
-                            {activeTab === 'details' ? (
+                            {modalLoading ? (
+                                <div className={styles.modalLoading}>
+                                    <div className="skeleton" style={{ height: '100px', width: '100%', marginBottom: '20px' }}></div>
+                                    <div className="skeleton" style={{ height: '200px', width: '100%' }}></div>
+                                </div>
+                            ) : activeTab === 'details' ? (
                                 <>
-                                    <div className={styles.modalSection}>
-                                        <h4>Staff Information</h4>
-                                        <p><strong>Name:</strong> {capitalizeName(selectedCall.agent_name)}</p>
-                                        <p><strong>Department:</strong> {selectedCall.scenario_name}</p>
-                                        <p><strong>Date / Time:</strong> {new Date(selectedCall.created_at).toLocaleString()}</p>
-                                        <p><strong>Duration:</strong> {selectedCall.duration || "N/A"}</p>
-                                    </div>
-                                    <div className={styles.modalSection}>
-                                        <h4>Call Transcript</h4>
-                                        <div className={styles.transcriptContainer}>
-                                            {selectedCall.transcript ? (
-                                                <div className={styles.transcriptText}>
-                                                    {selectedCall.transcript.split('\n').map((line, i) => (
-                                                        <p key={i} className={styles.transcriptLine}>{line}</p>
+                                    <div className={styles.modalFullWidth}>
+                                        <div className={styles.modalSection}>
+                                            <h4>Staff Information</h4>
+                                            <div className={styles.infoList}>
+                                                <p><strong>Name:</strong> {capitalizeName(selectedCall.agent_name)}</p>
+                                                <p><strong>Department:</strong> {selectedCall.scenario_name}</p>
+                                                <p><strong>Date / Time:</strong> {new Date(selectedCall.created_at).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+
+                                        {selectedCall.audio_files && selectedCall.audio_files.length > 0 && (
+                                            <div className={styles.modalSection}>
+                                                <h4>Session Recordings ({selectedCall.audio_files.length})</h4>
+                                                <div className={styles.audioList}>
+                                                    {selectedCall.audio_files.map((file, idx) => (
+                                                        <div key={file.id} className={styles.audioItem}>
+                                                            <span className={styles.audioLabel}>Recording {idx + 1}</span>
+                                                            <audio controls className={styles.audioPlayer}>
+                                                                <source src={file.url} type="audio/mpeg" />
+                                                                Your browser does not support the audio element.
+                                                            </audio>
+                                                        </div>
                                                     ))}
                                                 </div>
-                                            ) : (
-                                                <p className={styles.emptyTranscriptText}>No transcript available for this session.</p>
-                                            )}
+                                            </div>
+                                        )}
+
+                                        <div className={styles.modalSection}>
+                                            <h4>Call Transcript</h4>
+                                            <div className={styles.transcriptContainer}>
+                                                {selectedCall.transcript ? (
+                                                    <div className={styles.transcriptText}>
+                                                        {selectedCall.transcript.replace(/\*\*/g, '').split('\n').map((line, i) => (
+                                                            <p key={i} className={styles.transcriptLine}>{line}</p>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className={styles.emptyTranscriptText}>No transcript available for this session.</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </>
+                            ) : activeTab === 'sop' ? (
+                                <div className={styles.modalFullWidth}>
+                                    <div className={styles.modalSection}>
+                                        <h4>Step-by-Step SOP Adherence</h4>
+                                        <div className={styles.sopChecklist}>
+                                            {selectedCall.sop_adherence_checklist && selectedCall.sop_adherence_checklist.length > 0 ? (
+                                                selectedCall.sop_adherence_checklist.map((item, i) => (
+                                                    <div key={i} className={`${styles.sopItem} ${styles[item.status.replace(/ /g, '')]}`}>
+                                                        <div className={styles.sopStatus}>
+                                                            {item.status === 'Completed' ? '✓' : '✕'}
+                                                        </div>
+                                                        <div className={styles.sopContent}>
+                                                            <div className={styles.sopStepText}>{item.step}</div>
+                                                            {item.notes && <div className={styles.sopNote}>{item.notes}</div>}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className={styles.emptyText}>No SOP tracking data available.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             ) : (
                                 <>
                                     <div className={styles.modalSection}>

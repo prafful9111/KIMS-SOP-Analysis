@@ -21,7 +21,21 @@ export async function GET(
             return NextResponse.json({ error: 'Session not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ session });
+        // Generate presigned URLs for each audio file
+        const { getPresignedAudioUrl } = await import('@/lib/s3');
+        const audioFilesWithPresignedUrls = await Promise.all(
+            session.audio_files.map(async (file) => ({
+                ...file,
+                url: await getPresignedAudioUrl(file.url),
+            }))
+        );
+
+        return NextResponse.json({ 
+            session: {
+                ...session,
+                audio_files: audioFilesWithPresignedUrls
+            } 
+        });
     } catch (error) {
         console.error('[/api/dashboard/sessions/[id]] Error:', error);
         return NextResponse.json({ error: 'Failed to fetch session' }, { status: 500 });
